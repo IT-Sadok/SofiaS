@@ -1,6 +1,6 @@
-﻿namespace BookindService.API.ViewModels
+﻿namespace BookingService.Application.DTOs
 {
-    public class LoginModel
+    public class LoginDto
     {
         public string Username { get; set; }
         public string Password { get; set; }

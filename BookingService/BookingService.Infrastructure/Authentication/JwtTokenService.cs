@@ -18,16 +18,25 @@ namespace BookingService.Infrastructure.Authentication
             _configuration = configuration;
         }
 
-        public string GenerateToken()
+        public async Task<string> GenerateToken(User user)
         {
+            var userClaims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
-                expires: DateTime.Now.AddMinutes(120),
-                signingCredentials: credentials);
+                claims: userClaims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: credentials
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

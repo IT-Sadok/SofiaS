@@ -1,8 +1,6 @@
-﻿using BookindService.API.ViewModels;
-using BookingService.Application;
-using BookingService.Domain;
+﻿using BookingService.Application;
+using BookingService.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.Entity;
 
 namespace BookindService.API.Controllers
 {
@@ -19,16 +17,19 @@ namespace BookindService.API.Controllers
 
         [HttpPost]
         [Route("register")]
-        public IActionResult Register([FromBody] RegisterModel registerModel)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerdto)
         {
+            var result = await _userService.RegisterAsync(registerdto);
+            if (result.Succeeded)
+                return Ok("Registration successful");
 
+            return BadRequest(result.Errors);
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel loginModel)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var token = _userService.Authenticate(new User { UserName = loginModel.Username });
-
+            var token = await _userService.LoginAsync(loginDto);
             if (string.IsNullOrEmpty(token))
                 return Unauthorized();
 
