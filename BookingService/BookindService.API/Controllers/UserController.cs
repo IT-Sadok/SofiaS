@@ -1,16 +1,16 @@
-﻿using BookingService.Application;
+﻿using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookindService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("user")]
     [ApiController]
     public class UserController : ControllerBase
     {
-        private UserService _userService;
+        private IUserService _userService;
 
-        public UserController(UserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }

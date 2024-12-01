@@ -1,18 +1,22 @@
-﻿using BookingService.Application.DTOs;
+﻿using AutoMapper;
+using BookingService.Application.Abstract;
+using BookingService.Application.DTOs;
 using BookingService.Domain;
 using Microsoft.AspNetCore.Identity;
 
 namespace BookingService.Application
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private ITokenService _tokenService;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly ITokenService _tokenService;
+        private readonly ICustomUserManager _userManager;
+        private readonly IMapper _mapper;
 
-        public UserService(ITokenService tokenService)
+        public UserService(ITokenService tokenService, ICustomUserManager userManager, IMapper mapper)
         {
             _tokenService = tokenService;
+            _userManager = userManager;
+            _mapper = mapper;
         }
 
         public async Task<string> LoginAsync(LoginDto loginDto)
@@ -27,17 +31,9 @@ namespace BookingService.Application
 
         public async Task<IdentityResult> RegisterAsync(RegisterDto registerDto)
         {
-            var user = new User
-            {
-                UserName = registerDto.Username,
-                Email = registerDto.Email,
-            };
+            var user = _mapper.Map<User>(registerDto);
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
-            if (result.Succeeded)
-            {
-                 await _userManager.AddToRoleAsync(user, registerDto.Role);
-            }
             return result;
         }
 

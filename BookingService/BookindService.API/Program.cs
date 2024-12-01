@@ -1,6 +1,12 @@
+using BookingService.Application;
+using BookingService.Application.Abstract;
+using BookingService.Application.MappingProfile;
 using BookingService.Domain;
+using BookingService.Infrastructure.Authentication;
+using BookingService.Infrastructure.Configuration;
 using BookingService.Infrastructure.Database;
-using Microsoft.AspNet.Identity.EntityFramework;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,30 +15,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-/*
-#region Authentication
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = config["Jwt:Issuer"],
-            ValidAudience = config["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
 
-        };
-    });
-#endregion
-*/
+builder.Services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<AppDbContext>() 
+            .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<ICustomUserManager, CustomUserManager>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+
+
 
 var app = builder.Build();
 

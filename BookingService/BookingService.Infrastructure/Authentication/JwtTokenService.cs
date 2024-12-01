@@ -1,6 +1,6 @@
 ﻿using BookingService.Domain;
-
-using Microsoft.Extensions.Configuration;
+using BookingService.Infrastructure.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using System.IdentityModel.Tokens.Jwt;
@@ -9,13 +9,13 @@ using System.Text;
 
 namespace BookingService.Infrastructure.Authentication
 {
-    internal class JwtTokenService : ITokenService
+    public class JwtTokenService : ITokenService
     {
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<JwtSettings> _options;
 
-        public JwtTokenService(IConfiguration configuration)
+        public JwtTokenService(IOptions<JwtSettings> options)
         {
-            _configuration = configuration;
+            _options = options;
         }
 
         public async Task<string> GenerateToken(User user)
@@ -27,14 +27,14 @@ namespace BookingService.Infrastructure.Authentication
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _options.Value.Issuer,
+                audience: _options.Value.Audience,
                 claims: userClaims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddHours(_options.Value.ExpirationHours),
                 signingCredentials: credentials
             );
 

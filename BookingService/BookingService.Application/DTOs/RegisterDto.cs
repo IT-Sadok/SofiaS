@@ -1,6 +1,6 @@
 ﻿namespace BookingService.Application.DTOs
 {
-    public class RegisterDto
+    public record RegisterDto
     {
         public string Username { get; set; } = "";
         public string Email { get; set; } = "";
