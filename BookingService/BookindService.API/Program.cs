@@ -1,11 +1,12 @@
 using BookingService.Application;
 using BookingService.Application.Abstract;
 using BookingService.Application.MappingProfile;
+using BookingService.Application.Validation;
 using BookingService.Domain;
 using BookingService.Infrastructure.Authentication;
 using BookingService.Infrastructure.Configuration;
 using BookingService.Infrastructure.Database;
-
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginDtoValidator>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddAutoMapper(typeof(MappingProfile));

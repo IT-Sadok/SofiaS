@@ -19,9 +19,9 @@ namespace BookingService.Application
             return await _userManager.CreateAsync(user, password);
         }
 
-        public async Task<User> FindByNameAsync(string userName)
+        public async Task<User> FindByEmailAsync(string email)
         {
-            return await _userManager.FindByNameAsync(userName);
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)

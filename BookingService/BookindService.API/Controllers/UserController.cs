@@ -1,5 +1,6 @@
 ﻿using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookindService.API.Controllers
@@ -8,18 +9,28 @@ namespace BookindService.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IUserService _userService;
+        private readonly IUserService _userService;
+        private readonly IValidator<LoginDto> _loginValidator;
+        private readonly IValidator<RegisterDto> _registerValidator;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IValidator<LoginDto> loginValidator, IValidator<RegisterDto> registerValidator)
         {
             _userService = userService;
+            _loginValidator = loginValidator;
+            _registerValidator = registerValidator;
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerdto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var result = await _userService.RegisterAsync(registerdto);
+            var validationResult = await _registerValidator.ValidateAsync(registerDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+
+            var result = await _userService.RegisterAsync(registerDto);
             if (result.Succeeded)
                 return Ok("Registration successful");
 
@@ -29,6 +40,12 @@ namespace BookindService.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
+            var validationResult = await _loginValidator.ValidateAsync(loginDto);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+
             var token = await _userService.LoginAsync(loginDto);
             if (string.IsNullOrEmpty(token))
                 return Unauthorized();

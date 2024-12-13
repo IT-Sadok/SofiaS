@@ -21,7 +21,7 @@ namespace BookingService.Application
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
-            var user = await _userManager.FindByNameAsync(loginDto.Username);
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
                 return await _tokenService.GenerateToken(user);
