@@ -10,26 +10,16 @@ namespace BookindService.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IValidator<LoginDto> _loginValidator;
-        private readonly IValidator<RegisterDto> _registerValidator;
 
-        public UserController(IUserService userService, IValidator<LoginDto> loginValidator, IValidator<RegisterDto> registerValidator)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _loginValidator = loginValidator;
-            _registerValidator = registerValidator;
         }
 
         [HttpPost]
         [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var validationResult = await _registerValidator.ValidateAsync(registerDto);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
-
             var result = await _userService.RegisterAsync(registerDto);
             if (result.Succeeded)
                 return Ok("Registration successful");
@@ -40,12 +30,6 @@ namespace BookindService.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var validationResult = await _loginValidator.ValidateAsync(loginDto);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
-
             var token = await _userService.LoginAsync(loginDto);
             if (string.IsNullOrEmpty(token))
                 return Unauthorized();
