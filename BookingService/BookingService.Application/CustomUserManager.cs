@@ -1,12 +1,11 @@
 ﻿using BookingService.Application.Abstract;
-using BookingService.Domain;
+using BookingService.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace BookingService.Application
 {
     public class CustomUserManager : ICustomUserManager
     {
-
         private readonly UserManager<User> _userManager;
 
         public CustomUserManager(UserManager<User> userManager)
@@ -27,6 +26,11 @@ namespace BookingService.Application
         public async Task<bool> CheckPasswordAsync(User user, string password)
         {
             return await _userManager.CheckPasswordAsync(user, password);
+        }
+
+        public async Task<IdentityResult> AddToRoleAsync(User user, string role)
+        {
+            return await _userManager.AddToRoleAsync(user, role);
         }
     }
 }

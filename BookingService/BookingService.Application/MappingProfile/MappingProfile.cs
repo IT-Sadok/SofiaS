@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BookingService.Application.DTOs;
-using BookingService.Domain;
+using BookingService.Domain.Models;
 
 namespace BookingService.Application.MappingProfile
 {

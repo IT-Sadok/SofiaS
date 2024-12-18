@@ -1,4 +1,5 @@
 ﻿using BookingService.Application.DTOs;
+using BookingService.Domain.Constants;
 using FluentValidation;
 
 namespace BookingService.Application.Validation
@@ -28,7 +29,9 @@ namespace BookingService.Application.Validation
                 .Matches("[^a-zA-Z0-9]").WithMessage("Password must contain at least one special character.")
                 .Must(p => !p.Contains(" ")).WithMessage("Password cannot contain spaces.");
 
-            //TODO: Add Validation rules for Role property
+            RuleFor(x => x.Role)
+                .Must(role => Roles.AllRoles.Contains(role))
+                .WithMessage($"Role must be one of the following: {Roles.Admin}, {Roles.Host}, {Roles.User}");
         }
     }
 }

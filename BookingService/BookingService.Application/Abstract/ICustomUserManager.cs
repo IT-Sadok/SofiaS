@@ -1,5 +1,4 @@
-﻿using BookingService.Application.DTOs;
-using BookingService.Domain;
+﻿using BookingService.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace BookingService.Application.Abstract
@@ -9,5 +8,6 @@ namespace BookingService.Application.Abstract
         Task<IdentityResult> CreateAsync(User user, string password);
         Task<User> FindByEmailAsync(string email);
         Task<bool> CheckPasswordAsync(User user, string password);
+        Task<IdentityResult> AddToRoleAsync(User user, string role);
     }
 }
