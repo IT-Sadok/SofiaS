@@ -50,8 +50,7 @@ namespace BookingService.Application
                 return IdentityResult.Failed(new IdentityError { Description = "Role not found"});
             }
 
-            await _userManager.AddToRoleAsync(user, registerDto.Role);
-            return IdentityResult.Success;
+            return await _userManager.AddToRoleAsync(user, registerDto.Role);
         }
 
     }
