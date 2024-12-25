@@ -42,10 +42,12 @@ namespace BookingService.Testing
             var password = "Password123*";
             var loginDtoUser = new LoginDto { Email = email, Password = password };
             var user = new User { Email = email, PasswordHash = password };
+            var roles = new List<string>{ Roles.Admin };
 
             _mockCustomUserManager.Setup(userManager => userManager.FindByEmailAsync(loginDtoUser.Email)).ReturnsAsync(user);
             _mockCustomUserManager.Setup(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password)).ReturnsAsync(true);
-            _mockTokenService.Setup(tokenService => tokenService.GenerateToken(user)).ReturnsAsync("validJwtToken");
+            _mockCustomUserManager.Setup(userManager => userManager.GetRolesAsync(user)).ReturnsAsync(roles);
+            _mockTokenService.Setup(tokenService => tokenService.GenerateToken(user, roles)).ReturnsAsync("validJwtToken");
 
             //Act
             var result = await _userService.LoginAsync(loginDtoUser);
@@ -54,7 +56,8 @@ namespace BookingService.Testing
             result.Should().Be("validJwtToken");
             _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Once());
             _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password), Times.Once);
-            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user), Times.Once);
+            _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(user), Times.Once);
+            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user, roles), Times.Once);
         }
 
         [Fact]
@@ -65,6 +68,7 @@ namespace BookingService.Testing
             var password = "WrongPassword123*";
             var loginDtoUser = new LoginDto { Email = email, Password = password };
             var user = new User { Email = email, PasswordHash = password };
+            var roles = new List<string> { Roles.Admin };
 
             _mockCustomUserManager.Setup(userManager => userManager.FindByEmailAsync(loginDtoUser.Email)).ReturnsAsync(user);
             _mockCustomUserManager.Setup(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password)).ReturnsAsync(false);
@@ -76,7 +80,8 @@ namespace BookingService.Testing
             result.Should().BeNull();
             _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Once());
             _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password), Times.Once);
-            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user), Times.Never);
+            _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(user), Times.Never);
+            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user, roles), Times.Never);
         }
 
         [Fact]
@@ -87,6 +92,7 @@ namespace BookingService.Testing
             var password = "WrongPassword123*";
             var loginDtoUser = new LoginDto { Email = email, Password = password };
             var user = new User { Email = email, PasswordHash = password };
+            var roles = new List<string> { Roles.Admin };
 
             _mockCustomUserManager.Setup(userManager => userManager.FindByEmailAsync(loginDtoUser.Email)).ReturnsAsync((User)null);
 
@@ -97,7 +103,10 @@ namespace BookingService.Testing
             result.Should().BeNull();
             _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Once());
             _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password), Times.Never);
-            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user), Times.Never);
+            _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(user), Times.Never);
+            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user, roles), Times.Never);
+        }
+
         [Theory]
         [InlineData("valid.email@example.com", "Valid1@password")] // Happy path
         [InlineData("", "")] // Both fields empty
