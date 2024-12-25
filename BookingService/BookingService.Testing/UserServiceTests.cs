@@ -4,6 +4,7 @@ using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
 using BookingService.Application.Validation;
 using BookingService.Domain;
+using BookingService.Domain.Constants;
 using BookingService.Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
@@ -35,7 +36,7 @@ namespace BookingService.Testing
         }
 
         [Fact]
-        public async Task LoginAsync_ReturnsJwtToken_WhenEmailAndPasswordAreValid()
+        public async Task LoginAsync_ShouldReturnJwtToken_WhenEmailAndPasswordAreValid()
         {
             //Arrange
             var email = "test@example.com";
@@ -61,7 +62,7 @@ namespace BookingService.Testing
         }
 
         [Fact]
-        public async Task LoginAsync_ReturnsNull_WhenPasswordIsInvalid()
+        public async Task LoginAsync_ShouldReturnNull_WhenPasswordIsInvalid()
         {
             //Arrange
             var email = "test@example.com";
@@ -85,7 +86,7 @@ namespace BookingService.Testing
         }
 
         [Fact]
-        public async Task LoginAsync_ReturnsNull_WhenUserNotFound()
+        public async Task LoginAsync_ShouldReturnNull_WhenUserNotFound()
         {
             //Arrange
             var email = "test@example.com";
@@ -158,7 +159,7 @@ namespace BookingService.Testing
         }
 
         [Fact]
-        public async Task RegisterAsync_ReturnsSuccess_WhenValidData()
+        public async Task RegisterAsync_ShouldReturnSuccess_WhenValidData()
         {
             //Arrange
             var username = "test";
@@ -184,7 +185,7 @@ namespace BookingService.Testing
         }
 
         [Fact]
-        public async Task RegisterAsync_ReturnsFailed_WhenCreateFailed()
+        public async Task RegisterAsync_ShouldReturnFailed_WhenCreateFailed()
         {
             //Arrange
             var username = "test";
@@ -208,7 +209,7 @@ namespace BookingService.Testing
         }
 
         [Fact]
-        public async Task RegisterAsync_ReturnsFailed_WhenRoleNotExist()
+        public async Task RegisterAsync_ShouldReturnFailed_WhenRoleNotExist()
         {
             //Arrange
             var username = "test";
@@ -233,7 +234,7 @@ namespace BookingService.Testing
         }
 
         [Fact]
-        public async Task RegisterAsync_ReturnsFailed_WhenAddToRoleFailed()
+        public async Task RegisterAsync_ShouldReturnFailed_WhenAddToRoleFailed()
         {
             //Arrange
             var username = "test";
