@@ -27,7 +27,8 @@ namespace BookingService.Application
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
-                return await _tokenService.GenerateToken(user);
+                var roles = await _userManager.GetRolesAsync(user);
+                return await _tokenService.GenerateToken(user, roles);
             }
             return null;
         }
