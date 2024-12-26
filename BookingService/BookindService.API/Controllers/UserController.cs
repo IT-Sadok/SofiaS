@@ -1,5 +1,6 @@
 ﻿using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookindService.API.Controllers
@@ -8,7 +9,7 @@ namespace BookindService.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IUserService _userService;
+        private readonly IUserService _userService;
 
         public UserController(IUserService userService)
         {
@@ -17,9 +18,9 @@ namespace BookindService.API.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerdto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var result = await _userService.RegisterAsync(registerdto);
+            var result = await _userService.RegisterAsync(registerDto);
             if (result.Succeeded)
                 return Ok("Registration successful");
 

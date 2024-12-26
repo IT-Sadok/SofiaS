@@ -1,4 +1,5 @@
 ﻿using BookingService.Domain;
+using BookingService.Domain.Models;
 using BookingService.Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
