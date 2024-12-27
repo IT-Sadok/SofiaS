@@ -2,7 +2,7 @@
 using BookingService.Application;
 using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
-using BookingService.Application.Validation;
+using BookingService.Application.MappingProfile;
 using BookingService.Domain;
 using BookingService.Domain.Constants;
 using BookingService.Domain.Models;
@@ -17,299 +17,267 @@ namespace BookingService.Testing
         private readonly Mock<ITokenService> _mockTokenService;
         private readonly Mock<ICustomUserManager> _mockCustomUserManager;
         private readonly Mock<ICustomRoleManager> _mockCustomRoleManager;
-        private readonly Mock<IMapper> _mockMapper;
         private readonly UserService _userService;
-        private readonly LoginDtoValidator _loginDtoValidator;
-        private readonly RegisterDtoValidator _registerDtoValidator;
+
+        private readonly RegisterDto _registerDto = new RegisterDto { Username = "test", Email = "test@example.com", Password = "Password123*", Role = "User" };
+        private readonly LoginDto _loginDto = new LoginDto { Email = "test@example.com", Password = "Password123*" };
+        private readonly User _user = new User { Email = "test@example.com", PasswordHash = "Password123*" };
 
         public UserServiceTests()
         {
             _mockTokenService = new Mock<ITokenService>();
             _mockCustomUserManager = new Mock<ICustomUserManager>();
             _mockCustomRoleManager = new Mock<ICustomRoleManager>();
-            _mockMapper = new Mock<IMapper>();
+            var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>()));
 
-            _userService = new UserService(_mockTokenService.Object, _mockCustomUserManager.Object, _mockCustomRoleManager.Object, _mockMapper.Object);
-
-            _loginDtoValidator = new LoginDtoValidator();
-            _registerDtoValidator = new RegisterDtoValidator();
+            _userService = new UserService(_mockTokenService.Object, _mockCustomUserManager.Object, _mockCustomRoleManager.Object, mapper);
         }
-
+        
+        #region Login
         [Fact]
         public async Task LoginAsync_ShouldReturnJwtToken_WhenEmailAndPasswordAreValid()
         {
-            //Arrange
-            var email = "test@example.com";
-            var password = "Password123*";
-            var loginDtoUser = new LoginDto { Email = email, Password = password };
-            var user = new User { Email = email, PasswordHash = password };
-            var roles = new List<string>{ Roles.Admin };
+            string validJwt = "validJwt";
+            var roles = new List<string>{ Roles.Admin};
 
-            _mockCustomUserManager.Setup(userManager => userManager.FindByEmailAsync(loginDtoUser.Email)).ReturnsAsync(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password)).ReturnsAsync(true);
-            _mockCustomUserManager.Setup(userManager => userManager.GetRolesAsync(user)).ReturnsAsync(roles);
-            _mockTokenService.Setup(tokenService => tokenService.GenerateToken(user, roles)).ReturnsAsync("validJwtToken");
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(_user);
 
-            //Act
-            var result = await _userService.LoginAsync(loginDtoUser);
+            _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
+                .ReturnsAsync(true);
 
-            //Assert
-            result.Should().Be("validJwtToken");
-            _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Once());
-            _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password), Times.Once);
-            _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(user), Times.Once);
-            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user, roles), Times.Once);
+            _mockCustomUserManager.Setup(um => um.GetRolesAsync(_user))
+                .ReturnsAsync(roles);
+
+            _mockTokenService.Setup(tokenService => tokenService.GenerateToken(_user, roles))
+                .ReturnsAsync(validJwt);
+
+            var result = await _userService.LoginAsync(_loginDto);
+
+            result.Should().Be(validJwt);
         }
 
         [Fact]
         public async Task LoginAsync_ShouldReturnNull_WhenPasswordIsInvalid()
         {
-            //Arrange
-            var email = "test@example.com";
-            var password = "WrongPassword123*";
-            var loginDtoUser = new LoginDto { Email = email, Password = password };
-            var user = new User { Email = email, PasswordHash = password };
-            var roles = new List<string> { Roles.Admin };
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(_user);
 
-            _mockCustomUserManager.Setup(userManager => userManager.FindByEmailAsync(loginDtoUser.Email)).ReturnsAsync(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password)).ReturnsAsync(false);
+            _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
+                .ReturnsAsync(false);
 
-            //Act
-            var result = await _userService.LoginAsync(loginDtoUser);
+            var result = await _userService.LoginAsync(_loginDto);
 
-            //Assert
             result.Should().BeNull();
-            _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Once());
-            _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password), Times.Once);
-            _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(user), Times.Never);
-            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user, roles), Times.Never);
         }
 
         [Fact]
         public async Task LoginAsync_ShouldReturnNull_WhenUserNotFound()
         {
-            //Arrange
-            var email = "test@example.com";
-            var password = "WrongPassword123*";
-            var loginDtoUser = new LoginDto { Email = email, Password = password };
-            var user = new User { Email = email, PasswordHash = password };
-            var roles = new List<string> { Roles.Admin };
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(null as User);
 
-            _mockCustomUserManager.Setup(userManager => userManager.FindByEmailAsync(loginDtoUser.Email)).ReturnsAsync((User)null);
+            var result = await _userService.LoginAsync(_loginDto);
 
-            //Act
-            var result = await _userService.LoginAsync(loginDtoUser);
-
-            //Assert
             result.Should().BeNull();
-            _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Once());
-            _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password), Times.Never);
-            _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(user), Times.Never);
-            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(user, roles), Times.Never);
-        }
-
-        [Theory]
-        [InlineData("valid.email@example.com", "Valid1@password")] // Happy path
-        [InlineData("", "")] // Both fields empty
-        [InlineData("invalidemail", "Valid1@password")] // Invalid email format
-        [InlineData("valid.email@example.com", "")] // Empty password
-        [InlineData("", "Valid1@password")] // Empty email
-        [InlineData("valid.email@example.com", "short")] // Password too short
-        [InlineData("valid.email@example.com", "aVeryVeryLongPasswordThatExceedsTheMaximumLengthAllowed1234567890@")] // Password too long
-        [InlineData("valid.email@example.com", "nouppercase1@")] // No uppercase
-        [InlineData("valid.email@example.com", "NOLOWERCASE1@")] // No lowercase
-        [InlineData("valid.email@example.com", "NoNumber@")] // No number
-        [InlineData("valid.email@example.com", "NoSpecialCharacter1")] // No special character
-        [InlineData("valid.email@example.com", "No Space1@")] // Contains spaces
-        [InlineData("email@domain.com", "Pass1!word")] // Another valid happy path
-        public async Task LoginAsync_ShouldNotProceed_WhenValidationFails(string email, string password)
-        {
-            //Arrange
-            var loginDtoUser = new LoginDto { Email = email, Password = password };
-            var validationResult = await _loginDtoValidator.ValidateAsync(loginDtoUser);
-            var roles = new List<string> { Roles.Admin };
-
-            if (!validationResult.IsValid)
-            {
-                //Assert
-                _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Never());
-                _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(It.IsAny<User>(), loginDtoUser.Password), Times.Never);
-                _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(It.IsAny<User>()), Times.Never);
-                _mockTokenService.Verify(tokenService => tokenService.GenerateToken(It.IsAny<User>(), roles), Times.Never);
-
-                return;
-            }
-
-            var user = new User { Email = email, PasswordHash = password };
-
-            _mockCustomUserManager.Setup(userManager => userManager.FindByEmailAsync(loginDtoUser.Email)).ReturnsAsync(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CheckPasswordAsync(user, loginDtoUser.Password)).ReturnsAsync(true);
-            _mockCustomUserManager.Setup(userManager => userManager.GetRolesAsync(user)).ReturnsAsync(roles);
-            _mockTokenService.Setup(tokenService => tokenService.GenerateToken(user, roles)).ReturnsAsync("validJwtToken");
-
-            //Act 
-            var result = await _userService.LoginAsync(loginDtoUser);
-
-            //Assert
-            _mockCustomUserManager.Verify(userManager => userManager.FindByEmailAsync(loginDtoUser.Email), Times.Once());
-            _mockCustomUserManager.Verify(userManager => userManager.CheckPasswordAsync(It.IsAny<User>(), loginDtoUser.Password), Times.Once);
-            _mockCustomUserManager.Verify(userManager => userManager.GetRolesAsync(user), Times.Once);
-            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(It.IsAny<User>(), roles), Times.Once);
-
         }
 
         [Fact]
+        public async Task LoginAsync_ShouldFindUserByEmail()
+        {
+            var result = await _userService.LoginAsync(_loginDto);
+
+            _mockCustomUserManager.Verify(um => um.FindByEmailAsync(_loginDto.Email), Times.Once());
+        }
+
+        [Fact]
+        public async Task LoginAsync_ShouldCheckPassword_WhenUserFound()
+        {
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(_user);
+
+            var result = await _userService.LoginAsync(_loginDto);
+
+            _mockCustomUserManager.Verify(um => um.CheckPasswordAsync(_user, _loginDto.Password), Times.Once);
+        }
+
+        [Fact]
+        public async Task LoginAsync_ShouldGetRoles()
+        {
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(_user);
+
+            _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
+                .ReturnsAsync(true);
+
+            var result = await _userService.LoginAsync(_loginDto);
+
+            _mockCustomUserManager.Verify(um => um.GetRolesAsync(_user), Times.Once);
+        }
+
+        [Fact]
+        public async Task LoginAsync_ShouldGenerateToken()
+        {
+            var roles = new List<string> { Roles.Admin };
+
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(_user);
+
+            _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
+                .ReturnsAsync(true);
+
+            _mockCustomUserManager.Setup(um => um.GetRolesAsync(_user))
+                .ReturnsAsync(roles);
+
+            var result = await _userService.LoginAsync(_loginDto);
+
+            _mockTokenService.Verify(tokenService => tokenService.GenerateToken(_user, roles), Times.Once);
+        }
+
+        [Fact]
+        public async Task LoginAsync_ShouldNotCheckPassword_WhenUserNotFound()
+        {
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(null as User);
+
+            var result = await _userService.LoginAsync(_loginDto);
+
+            _mockCustomUserManager.Verify(um => um.CheckPasswordAsync(_user, _loginDto.Password), Times.Never);
+        }
+
+        [Fact]
+        public async Task LoginAsync_ShouldNotGetRoles_WhenUserNotFound()
+        {
+            _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
+                .ReturnsAsync(_user);
+
+            _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
+                .ReturnsAsync(false);
+
+            var result = await _userService.LoginAsync(_loginDto);
+
+            _mockCustomUserManager.Verify(um => um.GetRolesAsync(_user), Times.Never);
+        }
+
+        #endregion
+
+        #region Register
+        [Fact]
         public async Task RegisterAsync_ShouldReturnSuccess_WhenValidData()
         {
-            //Arrange
-            var username = "test";
-            var email = "test@example.com";
-            var password = "Password123*";
-            var role = "User";
-            var registerUserDto = new RegisterDto { Username = username, Email = email, Password = password, Role = role };
-            var user = new User();
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Success);
 
-            _mockMapper.Setup(mapper => mapper.Map<User>(registerUserDto)).Returns(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CreateAsync(user, registerUserDto.Password)).ReturnsAsync(IdentityResult.Success);
-            _mockCustomRoleManager.Setup(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role)).ReturnsAsync(true);
-            _mockCustomUserManager.Setup(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role)).ReturnsAsync(IdentityResult.Success);
+            _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
+                .ReturnsAsync(true);
 
-            //Act
-            var result = await _userService.RegisterAsync(registerUserDto);
+            _mockCustomUserManager.Setup(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role))
+                .ReturnsAsync(IdentityResult.Success);
 
-            //Assert
-            result.Should().Be(IdentityResult.Success);
-            _mockCustomUserManager.Verify(userManager => userManager.CreateAsync(user, registerUserDto.Password), Times.Once);
-            _mockCustomRoleManager.Verify(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role), Times.Once);
-            _mockCustomUserManager.Verify(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role), Times.Once);
+            var result = await _userService.RegisterAsync(_registerDto);
+
+            result.Succeeded.Should().BeTrue();
         }
 
         [Fact]
         public async Task RegisterAsync_ShouldReturnFailed_WhenCreateFailed()
         {
-            //Arrange
-            var username = "test";
-            var email = "test@example.com";
-            var password = "Password123*";
-            var role = "User";
-            var registerUserDto = new RegisterDto { Username = username, Email = email, Password = password, Role = role };
-            var user = new User();
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Failed());
 
-            _mockMapper.Setup(mapper => mapper.Map<User>(registerUserDto)).Returns(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CreateAsync(user, registerUserDto.Password)).ReturnsAsync(IdentityResult.Failed());
+            var result = await _userService.RegisterAsync(_registerDto);
 
-            //Act
-            var result = await _userService.RegisterAsync(registerUserDto);
-
-            //Assert
-            result.Should().NotBe(IdentityResult.Success);
-            _mockCustomUserManager.Verify(userManager => userManager.CreateAsync(user, registerUserDto.Password), Times.Once);
-            _mockCustomRoleManager.Verify(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role), Times.Never);
-            _mockCustomUserManager.Verify(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role), Times.Never);
+            result.Succeeded.Should().BeFalse();
         }
 
         [Fact]
         public async Task RegisterAsync_ShouldReturnFailed_WhenRoleNotExist()
         {
-            //Arrange
-            var username = "test";
-            var email = "test@example.com";
-            var password = "Password123*";
-            var role = "User";
-            var registerUserDto = new RegisterDto { Username = username, Email = email, Password = password, Role = role };
-            var user = new User();
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Success);
 
-            _mockMapper.Setup(mapper => mapper.Map<User>(registerUserDto)).Returns(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CreateAsync(user, registerUserDto.Password)).ReturnsAsync(IdentityResult.Success);
-            _mockCustomRoleManager.Setup(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role)).ReturnsAsync(false);
+            _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
+                .ReturnsAsync(false);
 
-            //Act
-            var result = await _userService.RegisterAsync(registerUserDto);
+            var result = await _userService.RegisterAsync(_registerDto);
 
-            //Assert
-            result.Should().NotBe(IdentityResult.Success);
-            _mockCustomUserManager.Verify(userManager => userManager.CreateAsync(user, registerUserDto.Password), Times.Once);
-            _mockCustomRoleManager.Verify(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role), Times.Once);
-            _mockCustomUserManager.Verify(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role), Times.Never);
+            result.Succeeded.Should().BeFalse();
         }
 
         [Fact]
         public async Task RegisterAsync_ShouldReturnFailed_WhenAddToRoleFailed()
         {
-            //Arrange
-            var username = "test";
-            var email = "test@example.com";
-            var password = "Password123*";
-            var role = "User";
-            var registerUserDto = new RegisterDto { Username = username, Email = email, Password = password, Role = role };
-            var user = new User();
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Success);
 
-            _mockMapper.Setup(mapper => mapper.Map<User>(registerUserDto)).Returns(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CreateAsync(user, registerUserDto.Password)).ReturnsAsync(IdentityResult.Success);
-            _mockCustomRoleManager.Setup(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role)).ReturnsAsync(true);
-            _mockCustomUserManager.Setup(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role)).ReturnsAsync(IdentityResult.Failed());
+            _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
+                .ReturnsAsync(true);
 
+            _mockCustomUserManager.Setup(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role))
+                .ReturnsAsync(IdentityResult.Failed());
 
-            //Act
-            var result = await _userService.RegisterAsync(registerUserDto);
+            var result = await _userService.RegisterAsync(_registerDto);
 
-            //Assert
-            result.Should().NotBe(IdentityResult.Success);
-            _mockCustomUserManager.Verify(userManager => userManager.CreateAsync(user, registerUserDto.Password), Times.Once);
-            _mockCustomRoleManager.Verify(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role), Times.Once);
-            _mockCustomUserManager.Verify(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role), Times.Once);
+            result.Succeeded.Should().BeFalse();
         }
 
-        [Theory]
-        [InlineData("validUser", "valid.email@example.com", "Valid1@password", "User")] // Happy path
-        [InlineData("", "valid.email@example.com", "Valid1@password", "User")] // Empty username
-        [InlineData("ab", "valid.email@example.com", "Valid1@password", "User")] // Username too short
-        [InlineData("ThisUsernameIsWayTooLongToBeValidForOurValidationRules", "valid.email@example.com", "Valid1@password", "User")] // Username too long
-        [InlineData("Invalid!User", "valid.email@example.com", "Valid1@password", "User")] // Username with invalid characters
-        [InlineData("validUser", "", "Valid1@password", "User")] // Empty email
-        [InlineData("validUser", "invalid-email", "Valid1@password", "User")] // Invalid email format
-        [InlineData("validUser", "valid.email@example.com", "", "User")] // Empty password
-        [InlineData("validUser", "valid.email@example.com", "short", "User")] // Password too short
-        [InlineData("validUser", "valid.email@example.com", "NoUpperCase1@", "User")] // Password without uppercase
-        [InlineData("validUser", "valid.email@example.com", "NOLOWERCASE1@", "User")] // Password without lowercase
-        [InlineData("validUser", "valid.email@example.com", "NoNumber@", "User")] // Password without number
-        [InlineData("validUser", "valid.email@example.com", "NoSpecialCharacter1", "User")] // Password without special character
-        [InlineData("validUser", "valid.email@example.com", "Password with space1@", "User")] // Password with spaces
-        [InlineData("validUser", "valid.email@example.com", "Valid1@password", "")] // Empty role
-        [InlineData("validUser", "valid.email@example.com", "Valid1@password", "InvalidRole")] // Invalid role
-        [InlineData("", "", "", "")] // All fields empty
-        [InlineData("validUser", "valid.email@example.com", "Valid1@password", "Admin")] // Valid with Admin role
-        [InlineData("validUser", "valid.email@example.com", "Valid1@password", "Host")] // Valid with Host role
-        public async Task RegisterAsync_ShouldNotProceed_WhenDataInvalid(string username, string email, string password, string role)
+        public async Task RegisterAsync_ShouldCreateUser()
         {
-            //Arrange
-            var registerUserDto = new RegisterDto { Username = username, Email = email, Password = password, Role = role };
-            var user = new User();
-            var validationResult = _registerDtoValidator.Validate(registerUserDto);
+            var result = await _userService.RegisterAsync(_registerDto);
 
-            if (!validationResult.IsValid)
-            {
-                _mockCustomUserManager.Verify(userManager => userManager.CreateAsync(user, registerUserDto.Password), Times.Never);
-                _mockCustomRoleManager.Verify(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role), Times.Never);
-                _mockCustomUserManager.Verify(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role), Times.Never);
-
-                return;
-            }
-
-            _mockMapper.Setup(mapper => mapper.Map<User>(registerUserDto)).Returns(user);
-            _mockCustomUserManager.Setup(userManager => userManager.CreateAsync(user, registerUserDto.Password)).ReturnsAsync(IdentityResult.Success);
-            _mockCustomRoleManager.Setup(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role)).ReturnsAsync(true);
-            _mockCustomUserManager.Setup(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role)).ReturnsAsync(IdentityResult.Success);
-
-            //Act
-            var result = await _userService.RegisterAsync(registerUserDto);
-
-            //Assert
-            result.Should().Be(IdentityResult.Success);
-            _mockCustomUserManager.Verify(userManager => userManager.CreateAsync(user, registerUserDto.Password), Times.Once);
-            _mockCustomRoleManager.Verify(roleManager => roleManager.RoleExistsAsync(registerUserDto.Role), Times.Once);
-            _mockCustomUserManager.Verify(userManager => userManager.AddToRoleAsync(user, registerUserDto.Role), Times.Once);
+            _mockCustomUserManager.Verify(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password), Times.Once);
         }
 
+        [Fact]
+        public async Task RegisterAsync_ShouldCheckRoleExisting_WhenCreatingUserSucceed()
+        {
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var result = await _userService.RegisterAsync(_registerDto);
+
+            _mockCustomRoleManager.Verify(rm => rm.RoleExistsAsync(_registerDto.Role), Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_ShouldAddToRole_WhenRoleExists()
+        {
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Success);
+
+            _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
+                .ReturnsAsync(true);
+
+            var result = await _userService.RegisterAsync(_registerDto);
+
+            _mockCustomUserManager.Verify(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role), Times.Once);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_ShouldNotCheckRoleExisting_WhenCreatingUserFailed()
+        {
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Failed());
+
+            var result = await _userService.RegisterAsync(_registerDto);
+
+            _mockCustomRoleManager.Verify(rm => rm.RoleExistsAsync(_registerDto.Role), Times.Never);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_ShouldNotAddToRole_WhenRoleNotExist()
+        {
+            _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
+                .ReturnsAsync(IdentityResult.Success);
+
+            _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
+                .ReturnsAsync(false);
+
+            var result = await _userService.RegisterAsync(_registerDto);
+
+            _mockCustomUserManager.Verify(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role), Times.Never);
+        }
+
+        #endregion
     }
 }
