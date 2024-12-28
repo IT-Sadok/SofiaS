@@ -27,7 +27,8 @@ namespace BookingService.Application
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
-                return await _tokenService.GenerateToken(user);
+                var roles = await _userManager.GetRolesAsync(user);
+                return await _tokenService.GenerateToken(user, roles);
             }
             return null;
         }
@@ -50,8 +51,7 @@ namespace BookingService.Application
                 return IdentityResult.Failed(new IdentityError { Description = "Role not found"});
             }
 
-            await _userManager.AddToRoleAsync(user, registerDto.Role);
-            return IdentityResult.Success;
+            return await _userManager.AddToRoleAsync(user, registerDto.Role);
         }
 
     }

@@ -19,22 +19,27 @@ namespace BookingService.Infrastructure.Authentication
             _options = options;
         }
 
-        public async Task<string> GenerateToken(User user)
+        public async Task<string> GenerateToken(User user, IEnumerable<string> roles)
         {
+            //payload
             var userClaims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id)
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            foreach (var role in roles)
+            {
+                userClaims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            //signature
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
+                claims: userClaims,
                 issuer: _options.Value.Issuer,
                 audience: _options.Value.Audience,
-                claims: userClaims,
                 expires: DateTime.Now.AddHours(_options.Value.ExpirationHours),
                 signingCredentials: credentials
             );

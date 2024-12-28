@@ -58,9 +58,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<AppDbContext>() 
-            .AddDefaultTokenProviders();
+builder.Services.AddIdentityCore<User>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<ICustomUserManager, CustomUserManager>();
@@ -68,7 +69,7 @@ builder.Services.AddScoped<ICustomRoleManager, CustomRoleManager>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 var jwtSettings = new JwtSettings();
-builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+builder.Configuration.GetSection("Jwt").Bind(jwtSettings);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

@@ -32,5 +32,10 @@ namespace BookingService.Application
         {
             return await _userManager.AddToRoleAsync(user, role);
         }
+
+        public async Task<IList<string>> GetRolesAsync(User user)
+        {
+            return await _userManager.GetRolesAsync(user);
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace BookingService.Application.Validation
                 .Must(p => !p.Contains(" ")).WithMessage("Password cannot contain spaces.");
 
             RuleFor(x => x.Role)
+                .NotEmpty().WithMessage("{PropertyName} is required.")
                 .Must(role => Roles.AllRoles.Contains(role))
                 .WithMessage($"Role must be one of the following: {Roles.Admin}, {Roles.Host}, {Roles.User}");
         }
