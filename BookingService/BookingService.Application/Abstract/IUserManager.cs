@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BookingService.Application.Abstract
 {
-    public interface ICustomUserManager
+    public interface IUserManager
     {
         Task<IdentityResult> CreateAsync(User user, string password);
         Task<User> FindByEmailAsync(string email);

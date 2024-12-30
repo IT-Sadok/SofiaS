@@ -2,13 +2,13 @@
 using BookingService.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace BookingService.Application
+namespace BookingService.Application.Services
 {
-    public class CustomUserManager : ICustomUserManager
+    public class UserManagerWrapper : IUserManager
     {
         private readonly UserManager<User> _userManager;
 
-        public CustomUserManager(UserManager<User> userManager)
+        public UserManagerWrapper(UserManager<User> userManager)
         {
             _userManager = userManager;
         }

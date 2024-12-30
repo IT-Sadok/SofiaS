@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using BookingService.Application;
 using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
-using BookingService.Application.MappingProfile;
-using BookingService.Domain;
+using BookingService.Application.Mapping;
+using BookingService.Application.Services;
 using BookingService.Domain.Constants;
+using BookingService.Domain.Interfaces;
 using BookingService.Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
@@ -15,8 +15,8 @@ namespace BookingService.Testing
     public class UserServiceTests
     {
         private readonly Mock<ITokenService> _mockTokenService;
-        private readonly Mock<ICustomUserManager> _mockCustomUserManager;
-        private readonly Mock<ICustomRoleManager> _mockCustomRoleManager;
+        private readonly Mock<IUserManager> _mockCustomUserManager;
+        private readonly Mock<IRoleManager> _mockCustomRoleManager;
         private readonly UserService _userService;
 
         private readonly RegisterDto _registerDto = new RegisterDto { Username = "test", Email = "test@example.com", Password = "Password123*", Role = "User" };
@@ -26,8 +26,8 @@ namespace BookingService.Testing
         public UserServiceTests()
         {
             _mockTokenService = new Mock<ITokenService>();
-            _mockCustomUserManager = new Mock<ICustomUserManager>();
-            _mockCustomRoleManager = new Mock<ICustomRoleManager>();
+            _mockCustomUserManager = new Mock<IUserManager>();
+            _mockCustomRoleManager = new Mock<IRoleManager>();
             var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>()));
 
             _userService = new UserService(_mockTokenService.Object, _mockCustomUserManager.Object, _mockCustomRoleManager.Object, mapper);
