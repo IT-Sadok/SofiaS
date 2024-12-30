@@ -1,13 +1,14 @@
 using BookingService.API.Middleware;
-using BookingService.Application;
 using BookingService.Application.Abstract;
-using BookingService.Application.MappingProfile;
+using BookingService.Application.Mapping;
+using BookingService.Application.Services;
 using BookingService.Application.Validation;
-using BookingService.Domain;
+using BookingService.Domain.Interfaces;
 using BookingService.Domain.Models;
 using BookingService.Infrastructure.Authentication;
 using BookingService.Infrastructure.Configuration;
 using BookingService.Infrastructure.Database;
+using BookingService.Infrastructure.Repository;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -63,9 +64,11 @@ builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddScoped<IApartmentRepository, ApartmentRepository>();
+builder.Services.AddScoped<IApartmentService, ApartmentService>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
-builder.Services.AddScoped<ICustomUserManager, CustomUserManager>();
-builder.Services.AddScoped<ICustomRoleManager, CustomRoleManager>();
+builder.Services.AddScoped<IUserManager, UserManagerWrapper>();
+builder.Services.AddScoped<IRoleManager, RoleManagerWrapper>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 var jwtSettings = new JwtSettings();

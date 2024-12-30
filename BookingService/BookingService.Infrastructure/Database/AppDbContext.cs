@@ -12,9 +12,12 @@ namespace BookingService.Infrastructure.Database
         {  
         }
 
+        public DbSet<Apartment> Apartments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(typeof(InfrastructureAssembly).Assembly);
 
             builder.Entity<IdentityRole>().HasData(
                 new IdentityRole { Name = Constants.Roles.Admin, NormalizedName = Constants.Roles.Admin.ToUpper() },
