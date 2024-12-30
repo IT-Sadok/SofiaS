@@ -1,5 +1,5 @@
 ﻿using BookingService.Domain.Interfaces;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
 using BookingService.Infrastructure.Database;
 
 namespace BookingService.Infrastructure.Repository

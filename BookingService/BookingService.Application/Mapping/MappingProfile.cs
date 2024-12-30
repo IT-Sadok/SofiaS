@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BookingService.Application.DTOs;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
 
 namespace BookingService.Application.Mapping
 {

@@ -1,4 +1,4 @@
-﻿using BookingService.Domain.Models;
+﻿using BookingService.Domain.Entities;
 
 namespace BookingService.Domain.Interfaces
 {

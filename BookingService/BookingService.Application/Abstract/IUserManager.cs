@@ -1,4 +1,4 @@
-﻿using BookingService.Domain.Models;
+﻿using BookingService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace BookingService.Application.Abstract

@@ -1,4 +1,4 @@
-﻿namespace BookingService.Domain.Models
+﻿namespace BookingService.Domain.Entities
 {
     public class Apartment
     {

@@ -4,7 +4,7 @@ using BookingService.Application.Mapping;
 using BookingService.Application.Services;
 using BookingService.Application.Validation;
 using BookingService.Domain.Interfaces;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
 using BookingService.Infrastructure.Authentication;
 using BookingService.Infrastructure.Configuration;
 using BookingService.Infrastructure.Database;

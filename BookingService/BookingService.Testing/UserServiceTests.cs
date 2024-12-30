@@ -5,7 +5,7 @@ using BookingService.Application.Mapping;
 using BookingService.Application.Services;
 using BookingService.Domain.Constants;
 using BookingService.Domain.Interfaces;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;

@@ -1,5 +1,5 @@
 ﻿using Constants = BookingService.Domain.Constants;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

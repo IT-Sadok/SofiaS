@@ -2,7 +2,7 @@
 using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
 using BookingService.Domain.Interfaces;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace BookingService.Application.Services
