@@ -1,58 +1,38 @@
-﻿using AutoMapper;
-using BookingService.Application.Abstract;
+﻿using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
-using BookingService.Domain.Interfaces;
 using BookingService.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
+using BookingService.Domain.Interfaces;
 
 namespace BookingService.Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly ITokenService _tokenService;
+        private readonly IWalletRepository _walletRepository;
         private readonly IUserManager _userManager;
-        private readonly IRoleManager _roleManager;
-        private readonly IMapper _mapper;
 
-        public UserService(ITokenService tokenService, IUserManager userManager, IRoleManager roleManager, IMapper mapper)
+        public UserService(IWalletRepository walletRepository, IUserManager userManager)
         {
-            _tokenService = tokenService;
+            _walletRepository = walletRepository;
             _userManager = userManager;
-            _roleManager = roleManager;
-            _mapper = mapper;
         }
-
-        public async Task<string> LoginAsync(LoginDto loginDto)
+        public async Task<Result> TopUpBalance(string userId, WalletTopUpDto topUpDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
-
-            if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                return await _tokenService.GenerateToken(user, roles);
-            }
-            return null;
-        }
-
-        public async Task<IdentityResult> RegisterAsync(RegisterDto registerDto)
-        {
-            var user = _mapper.Map<User>(registerDto);
-
-            var result = await _userManager.CreateAsync(user, registerDto.Password);
-
-            if (!result.Succeeded)
-            {
-                return result;
+                return Result.Failure($"User with id {userId} was not found");
             }
 
-            var roleExists = await _roleManager.RoleExistsAsync(registerDto.Role);
-
-            if (!roleExists)
+            var wallet = await _walletRepository.FindWalletByUserIdAsync(userId);
+            if (wallet == null)
             {
-                return IdentityResult.Failed(new IdentityError { Description = "Role was not found." });
+                return Result.Failure($"User with id {userId} doesn't have wallet");
             }
 
-            return await _userManager.AddToRoleAsync(user, registerDto.Role);
+            wallet.Balance += topUpDto.Amount;
+
+            await _walletRepository.UpdateAsync(wallet);
+            return Result.Success();
         }
     }
 }

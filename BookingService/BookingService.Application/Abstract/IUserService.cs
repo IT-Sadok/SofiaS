@@ -1,11 +1,10 @@
 ﻿using BookingService.Application.DTOs;
-using Microsoft.AspNetCore.Identity;
+using BookingService.Domain.Entities;
 
 namespace BookingService.Application.Abstract
 {
     public interface IUserService
     {
-        Task<string> LoginAsync(LoginDto loginDto);
-        Task<IdentityResult> RegisterAsync(RegisterDto registerDto);
+        Task<Result> TopUpBalance(string userId, WalletTopUpDto topUpDto);
     }
 }

@@ -62,15 +62,13 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 builder.Services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IApartmentRepository, ApartmentRepository>();
-builder.Services.AddScoped<IApartmentService, ApartmentService>();
-builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<IUserManager, UserManagerWrapper>();
 builder.Services.AddScoped<IRoleManager, RoleManagerWrapper>();
 builder.Services.AddScoped<ITokenService, JwtService>();
