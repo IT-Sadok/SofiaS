@@ -1,10 +1,10 @@
 ﻿namespace BookingService.Application.DTOs
 {
-    public class ApartmentCreateDto
+    public record ApartmentCreateDto
     {
-        public string? Name { get; set; }
-        public decimal Price { get; set; }
-        public string? Address { get; set; }
-        public int RoomNumber { get; set; }
+        public string? Name { get; init; }
+        public decimal Price { get; init; }
+        public string? Address { get; init; }
+        public int RoomNumber { get; init; }
     }
 }

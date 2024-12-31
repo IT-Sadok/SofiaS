@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using BookingService.Infrastructure.IdentityServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,8 @@ builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(typ
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+#region Swagger
 builder.Services.AddSwaggerGen(opt =>
 {
     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
@@ -51,6 +54,7 @@ builder.Services.AddSwaggerGen(opt =>
         }
     });
 });
+#endregion
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -69,8 +73,13 @@ builder.Services.AddScoped<IApartmentService, ApartmentService>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IUserManager, UserManagerWrapper>();
 builder.Services.AddScoped<IRoleManager, RoleManagerWrapper>();
+builder.Services.AddScoped<ITokenService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IApartmentService, ApartmentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+
+#region Authentication
 var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection("Jwt").Bind(jwtSettings);
 
@@ -92,7 +101,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
     });
+#endregion
 
+#region Authorization
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>
@@ -102,6 +113,7 @@ builder.Services.AddAuthorization(options =>
     });
 
 });
+#endregion
 
 
 var app = builder.Build();

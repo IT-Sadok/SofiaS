@@ -1,7 +1,7 @@
-﻿using BookingService.Application.Abstract;
+﻿using BookingService.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace BookingService.Application.Services
+namespace BookingService.Infrastructure.IdentityServices
 {
     public class RoleManagerWrapper : IRoleManager
     {

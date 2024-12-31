@@ -1,4 +1,4 @@
-﻿namespace BookingService.Application.Abstract
+﻿namespace BookingService.Domain.Interfaces
 {
     public interface IRoleManager
     {

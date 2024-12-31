@@ -1,8 +1,8 @@
-﻿using BookingService.Application.Abstract;
-using BookingService.Domain.Entities;
+﻿using BookingService.Domain.Entities;
+using BookingService.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace BookingService.Application.Services
+namespace BookingService.Infrastructure.IdentityServices
 {
     public class UserManagerWrapper : IUserManager
     {
@@ -18,9 +18,13 @@ namespace BookingService.Application.Services
             return await _userManager.CreateAsync(user, password);
         }
 
-        public async Task<User> FindByEmailAsync(string email)
+        public async Task<User?> FindByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
+        }
+        public async Task<User?> FindByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)
@@ -37,5 +41,6 @@ namespace BookingService.Application.Services
         {
             return await _userManager.GetRolesAsync(user);
         }
+
     }
 }

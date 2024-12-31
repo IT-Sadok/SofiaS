@@ -1,26 +1,24 @@
 ﻿using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookindService.API.Controllers
 {
-    [Route("user")]
+    [Route("auth")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
-        public UserController(IUserService userService)
+        public AuthController(IAuthService authService)
         {
-            _userService = userService;
+            _authService = authService;
         }
 
-        [HttpPost]
-        [Route("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var result = await _userService.RegisterAsync(registerDto);
+            var result = await _authService.RegisterAsync(registerDto);
             if (result.Succeeded)
                 return Ok("Registration successful");
 
@@ -30,7 +28,7 @@ namespace BookindService.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var token = await _userService.LoginAsync(loginDto);
+            var token = await _authService.LoginAsync(loginDto);
             if (string.IsNullOrEmpty(token))
                 return Unauthorized();
 
