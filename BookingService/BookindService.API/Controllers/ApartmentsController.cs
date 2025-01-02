@@ -21,7 +21,12 @@ namespace BookingService.API.Controllers
         [Authorize(Roles = Roles.Host)]
         public async Task<ActionResult> CreateApartment([FromBody] ApartmentCreateDto apartmentDto)
         {
-            var result = await _apartmentService.CreateApartmentAsync(apartmentDto);
+            var hostId = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            if (hostId == null )
+            {
+                return BadRequest("User is not authorized");
+            }
+            var result = await _apartmentService.CreateApartmentAsync(hostId, apartmentDto);
             return Ok($"Apartment is successfully created with id - {result.Value}");
         }
     }
