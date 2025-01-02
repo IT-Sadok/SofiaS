@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BookingService.Application.Validation
 {
-    public class ApartmentCreateValidator : AbstractValidator<ApartmentCreateDto>
+    public class ApartmentCreateDtoValidator : AbstractValidator<ApartmentCreateDto>
     {
-        public ApartmentCreateValidator()
+        public ApartmentCreateDtoValidator()
         {
             RuleFor(x => x.Name)
                .NotEmpty().WithMessage("{PropertyName} is required.");

@@ -5,6 +5,6 @@ namespace BookingService.Application.Abstract
 {
     public interface IApartmentService
     {
-        Task<Result<int>> CreateApartmentAsync(ApartmentCreateDto apartmentDto);
+        Task<Result<int>> CreateApartmentAsync(string hostId, ApartmentCreateDto apartmentDto);
     }
 }
