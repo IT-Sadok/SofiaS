@@ -28,5 +28,15 @@ namespace BookingService.Infrastructure.Repository
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task UpdateAsyncByUserId(string userId)
+        {
+            var wallet = await FindWalletByUserIdAsync(userId);
+            if (wallet != null)
+            {
+                _context.Wallets.Update(wallet);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

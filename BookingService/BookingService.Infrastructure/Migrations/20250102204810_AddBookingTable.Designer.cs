@@ -4,6 +4,7 @@ using BookingService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250102204810_AddBookingTable")]
+    partial class AddBookingTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,7 @@ namespace BookingService.Infrastructure.Migrations
 
                     b.Property<string>("HostId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
@@ -51,8 +54,6 @@ namespace BookingService.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("HostId");
 
                     b.ToTable("Apartments");
                 });
@@ -73,25 +74,19 @@ namespace BookingService.Infrastructure.Migrations
 
                     b.Property<string>("HostId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("TotalPrice")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApartmentId");
-
-                    b.HasIndex("HostId");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Bookings");
                 });
@@ -213,19 +208,19 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "47575409-9673-4d41-9906-d010f12e6976",
+                            Id = "707a9c5f-1aca-4808-b4cc-0e4e55730650",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "2988b275-4116-4048-a617-c87dd3a2bdac",
+                            Id = "fd9aff76-00df-4e98-9f5c-67fa560c4cbe",
                             Name = "Host",
                             NormalizedName = "HOST"
                         },
                         new
                         {
-                            Id = "b88d87d9-b5d2-46c0-a472-7a70d57ebf21",
+                            Id = "692f91ed-8992-48c2-b23c-14fbacd1896c",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -337,44 +332,6 @@ namespace BookingService.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BookingService.Domain.Entities.Apartment", b =>
-                {
-                    b.HasOne("BookingService.Domain.Entities.User", "Host")
-                        .WithMany("Apartments")
-                        .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Host");
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.Booking", b =>
-                {
-                    b.HasOne("BookingService.Domain.Entities.Apartment", "Apartment")
-                        .WithMany("Bookings")
-                        .HasForeignKey("ApartmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("BookingService.Domain.Entities.User", "Host")
-                        .WithMany("HostBookings")
-                        .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("BookingService.Domain.Entities.User", "Tenant")
-                        .WithMany("TenantBookings")
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Apartment");
-
-                    b.Navigation("Host");
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("BookingService.Domain.Entities.Wallet", b =>
                 {
                     b.HasOne("BookingService.Domain.Entities.User", "User")
@@ -437,19 +394,8 @@ namespace BookingService.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BookingService.Domain.Entities.Apartment", b =>
-                {
-                    b.Navigation("Bookings");
-                });
-
             modelBuilder.Entity("BookingService.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Apartments");
-
-                    b.Navigation("HostBookings");
-
-                    b.Navigation("TenantBookings");
-
                     b.Navigation("Wallet");
                 });
 #pragma warning restore 612, 618

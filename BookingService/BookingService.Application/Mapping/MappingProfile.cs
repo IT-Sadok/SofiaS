@@ -12,6 +12,7 @@ namespace BookingService.Application.Mapping
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Username));
 
             CreateMap<ApartmentCreateDto, Apartment>();
+            CreateMap<BookingCreateDto, Booking>();
         }
     }
 }

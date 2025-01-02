@@ -13,6 +13,10 @@ namespace BookingService.Infrastructure.ModelConfiguration
 
             builder.Property(x => x.Address)
                 .IsRequired();
+            builder
+                .HasOne(a => a.Host)
+                .WithMany(u => u.Apartments)
+                .HasForeignKey(a => a.HostId);
         }
     }
 }

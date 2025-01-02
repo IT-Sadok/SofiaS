@@ -11,5 +11,6 @@
 
         public required string HostId { get; set; }
         public required User Host { get; set; }
+        public required ICollection<Booking> Bookings { get; set; }
     }
 }

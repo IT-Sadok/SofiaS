@@ -13,6 +13,7 @@ namespace BookingService.Infrastructure.Database
 
         public DbSet<Apartment> Apartments { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -6,5 +6,6 @@ namespace BookingService.Domain.Interfaces
     {
         Task<Wallet?> FindWalletByUserIdAsync(string userId);
         Task UpdateAsync(Wallet wallet);
+        Task UpdateAsyncByUserId(string userId);
     }
 }

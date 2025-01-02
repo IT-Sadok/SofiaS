@@ -19,5 +19,19 @@ namespace BookingService.Infrastructure.Repository
             await _context.SaveChangesAsync();
             return apartment.Id;
         }
+
+        public async Task<Apartment?> FindApartmentByIdAsync(int apartmentId)
+        {
+            return await _context.Apartments.FindAsync(apartmentId);
+        }
+
+        public async Task UpdateAsync(Apartment apartment)
+        {
+            if (apartment != null)
+            {
+                _context.Apartments.Update(apartment);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }
