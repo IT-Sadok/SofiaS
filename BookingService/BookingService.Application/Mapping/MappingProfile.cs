@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BookingService.Application.DTOs;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
 
-namespace BookingService.Application.MappingProfile
+namespace BookingService.Application.Mapping
 {
     public class MappingProfile : Profile
     {
@@ -10,6 +10,9 @@ namespace BookingService.Application.MappingProfile
         {
             CreateMap<RegisterDto, User>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Username));
+
+            CreateMap<ApartmentCreateDto, Apartment>();
+            CreateMap<BookingCreateDto, Booking>();
         }
     }
 }

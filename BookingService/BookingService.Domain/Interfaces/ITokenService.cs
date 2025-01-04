@@ -1,6 +1,6 @@
-﻿using BookingService.Domain.Models;
+﻿using BookingService.Domain.Entities;
 
-namespace BookingService.Domain
+namespace BookingService.Domain.Interfaces
 {
     public interface ITokenService
     {

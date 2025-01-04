@@ -1,20 +1,20 @@
 ﻿using AutoMapper;
 using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
-using BookingService.Domain;
-using BookingService.Domain.Models;
+using BookingService.Domain.Interfaces;
+using BookingService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace BookingService.Application
+namespace BookingService.Application.Services
 {
-    public class UserService : IUserService
+    public class AuthService : IAuthService
     {
         private readonly ITokenService _tokenService;
-        private readonly ICustomUserManager _userManager;
-        private readonly ICustomRoleManager _roleManager;
+        private readonly IUserManager _userManager;
+        private readonly IRoleManager _roleManager;
         private readonly IMapper _mapper;
 
-        public UserService(ITokenService tokenService, ICustomUserManager userManager, ICustomRoleManager roleManager, IMapper mapper)
+        public AuthService(ITokenService tokenService, IUserManager userManager, IRoleManager roleManager, IMapper mapper)
         {
             _tokenService = tokenService;
             _userManager = userManager;
@@ -25,6 +25,7 @@ namespace BookingService.Application
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
             if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
                 var roles = await _userManager.GetRolesAsync(user);
@@ -48,11 +49,10 @@ namespace BookingService.Application
 
             if (!roleExists)
             {
-                return IdentityResult.Failed(new IdentityError { Description = "Role not found"});
+                return IdentityResult.Failed(new IdentityError { Description = "Role was not found." });
             }
 
             return await _userManager.AddToRoleAsync(user, registerDto.Role);
         }
-
     }
 }

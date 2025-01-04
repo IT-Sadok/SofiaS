@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BookingService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/test")]
     [ApiController]
     public class TestController : ControllerBase
     {

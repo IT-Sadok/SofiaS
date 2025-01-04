@@ -3,8 +3,8 @@ using BookingService.Domain.Entities;
 
 namespace BookingService.Application.Abstract
 {
-    public interface IUserService
+    public interface IApartmentService
     {
-        Task<Result> TopUpBalance(string userId, WalletTopUpDto topUpDto);
+        Task<Result<int>> CreateApartmentAsync(string hostId, ApartmentCreateDto apartmentDto);
     }
 }

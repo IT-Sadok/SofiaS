@@ -1,14 +1,15 @@
-﻿using BookingService.Application.Abstract;
-using BookingService.Domain.Models;
+﻿using BookingService.Domain.Entities;
+using BookingService.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
-namespace BookingService.Application
+namespace BookingService.Infrastructure.IdentityServices
 {
-    public class CustomUserManager : ICustomUserManager
+    public class UserManagerWrapper : IUserManager
     {
         private readonly UserManager<User> _userManager;
 
-        public CustomUserManager(UserManager<User> userManager)
+        public UserManagerWrapper(UserManager<User> userManager)
         {
             _userManager = userManager;
         }
@@ -18,9 +19,13 @@ namespace BookingService.Application
             return await _userManager.CreateAsync(user, password);
         }
 
-        public async Task<User> FindByEmailAsync(string email)
+        public async Task<User?> FindByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
+        }
+        public async Task<User?> FindByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)
@@ -36,6 +41,13 @@ namespace BookingService.Application
         public async Task<IList<string>> GetRolesAsync(User user)
         {
             return await _userManager.GetRolesAsync(user);
+        }
+
+        public async Task<List<User>> FindByIdsAsync(params string[] userIds)
+        {
+            return await _userManager.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
         }
     }
 }

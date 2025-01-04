@@ -4,6 +4,7 @@ using BookingService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250102205826_AddConstraintsBookingApartment")]
+    partial class AddConstraintsBookingApartment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,11 +41,14 @@ namespace BookingService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<int>("RoomNumber")
                         .HasColumnType("int");
@@ -65,24 +71,30 @@ namespace BookingService.Infrastructure.Migrations
                     b.Property<int>("ApartmentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("HostId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("HostId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Bookings");
                 });
@@ -160,8 +172,8 @@ namespace BookingService.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Balance")
+                        .HasColumnType("float");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -204,19 +216,19 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6f4da681-bcd5-47e5-9abf-125351ea0cd2",
+                            Id = "47575409-9673-4d41-9906-d010f12e6976",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3d88752b-0276-4c1c-89aa-428af122fb4f",
+                            Id = "2988b275-4116-4048-a617-c87dd3a2bdac",
                             Name = "Host",
                             NormalizedName = "HOST"
                         },
                         new
                         {
-                            Id = "3ac52668-7612-4dab-8903-1a863ca1c2d2",
+                            Id = "b88d87d9-b5d2-46c0-a472-7a70d57ebf21",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -347,15 +359,23 @@ namespace BookingService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("BookingService.Domain.Entities.User", "Client")
-                        .WithMany("ClientBookings")
-                        .HasForeignKey("ClientId")
+                    b.HasOne("BookingService.Domain.Entities.User", "Host")
+                        .WithMany("HostBookings")
+                        .HasForeignKey("HostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BookingService.Domain.Entities.User", "Tenant")
+                        .WithMany("TenantBookings")
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Apartment");
 
-                    b.Navigation("Client");
+                    b.Navigation("Host");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("BookingService.Domain.Entities.Wallet", b =>
@@ -429,7 +449,9 @@ namespace BookingService.Infrastructure.Migrations
                 {
                     b.Navigation("Apartments");
 
-                    b.Navigation("ClientBookings");
+                    b.Navigation("HostBookings");
+
+                    b.Navigation("TenantBookings");
 
                     b.Navigation("Wallet");
                 });

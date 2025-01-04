@@ -1,13 +1,13 @@
-﻿using BookingService.Application.Abstract;
+﻿using BookingService.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
-namespace BookingService.Application
+namespace BookingService.Infrastructure.IdentityServices
 {
-    public class CustomRoleManager : ICustomRoleManager
+    public class RoleManagerWrapper : IRoleManager
     {
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public CustomRoleManager(RoleManager<IdentityRole> roleManager)
+        public RoleManagerWrapper(RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
         }

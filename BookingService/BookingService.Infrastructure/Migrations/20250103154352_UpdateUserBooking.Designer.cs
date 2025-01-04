@@ -4,6 +4,7 @@ using BookingService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103154352_UpdateUserBooking")]
+    partial class UpdateUserBooking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,11 +41,14 @@ namespace BookingService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<int>("RoomNumber")
                         .HasColumnType("int");
@@ -75,8 +81,8 @@ namespace BookingService.Infrastructure.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -160,8 +166,8 @@ namespace BookingService.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Balance")
+                        .HasColumnType("float");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -204,19 +210,19 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6f4da681-bcd5-47e5-9abf-125351ea0cd2",
+                            Id = "5ffeef37-7091-4fe9-97b2-aaf91c526b57",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3d88752b-0276-4c1c-89aa-428af122fb4f",
+                            Id = "fce66a34-7efb-4c35-9d3b-217c5d3e5f95",
                             Name = "Host",
                             NormalizedName = "HOST"
                         },
                         new
                         {
-                            Id = "3ac52668-7612-4dab-8903-1a863ca1c2d2",
+                            Id = "7e7de068-46fd-4edc-b394-f794be4cdb48",
                             Name = "User",
                             NormalizedName = "USER"
                         });

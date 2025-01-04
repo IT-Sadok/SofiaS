@@ -1,13 +1,14 @@
 using BookingService.API.Middleware;
-using BookingService.Application;
 using BookingService.Application.Abstract;
-using BookingService.Application.MappingProfile;
+using BookingService.Application.Mapping;
+using BookingService.Application.Services;
 using BookingService.Application.Validation;
-using BookingService.Domain;
-using BookingService.Domain.Models;
+using BookingService.Domain.Interfaces;
+using BookingService.Domain.Entities;
 using BookingService.Infrastructure.Authentication;
 using BookingService.Infrastructure.Configuration;
 using BookingService.Infrastructure.Database;
+using BookingService.Infrastructure.Repository;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using BookingService.Infrastructure.IdentityServices;
+using BookingService.Infrastructure.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,8 @@ builder.Services.AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(typ
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+#region Swagger
 builder.Services.AddSwaggerGen(opt =>
 {
     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
@@ -50,6 +55,7 @@ builder.Services.AddSwaggerGen(opt =>
         }
     });
 });
+#endregion
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -57,17 +63,25 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 builder.Services.AddIdentityCore<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddScoped<ITokenService, JwtTokenService>();
-builder.Services.AddScoped<ICustomUserManager, CustomUserManager>();
-builder.Services.AddScoped<ICustomRoleManager, CustomRoleManager>();
+builder.Services.AddScoped<IApartmentRepository, ApartmentRepository>();
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IUserManager, UserManagerWrapper>();
+builder.Services.AddScoped<IRoleManager, RoleManagerWrapper>();
+builder.Services.AddScoped<ITokenService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IApartmentService, ApartmentService>();
+builder.Services.AddScoped<IRentalService, RentalService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+
+#region Authentication
 var jwtSettings = new JwtSettings();
 builder.Configuration.GetSection("Jwt").Bind(jwtSettings);
 
@@ -89,7 +103,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
     });
+#endregion
 
+#region Authorization
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Bearer", policy =>
@@ -99,6 +115,7 @@ builder.Services.AddAuthorization(options =>
     });
 
 });
+#endregion
 
 
 var app = builder.Build();

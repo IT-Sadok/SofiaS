@@ -1,36 +1,35 @@
 ﻿using AutoMapper;
-using BookingService.Application;
-using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
-using BookingService.Application.MappingProfile;
-using BookingService.Domain;
+using BookingService.Application.Mapping;
+using BookingService.Application.Services;
 using BookingService.Domain.Constants;
-using BookingService.Domain.Models;
+using BookingService.Domain.Entities;
+using BookingService.Domain.Interfaces;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace BookingService.Testing
 {
-    public class UserServiceTests
+    public class AuthServiceTests
     {
         private readonly Mock<ITokenService> _mockTokenService;
-        private readonly Mock<ICustomUserManager> _mockCustomUserManager;
-        private readonly Mock<ICustomRoleManager> _mockCustomRoleManager;
-        private readonly UserService _userService;
+        private readonly Mock<IUserManager> _mockCustomUserManager;
+        private readonly Mock<IRoleManager> _mockCustomRoleManager;
+        private readonly AuthService _authService;
 
         private readonly RegisterDto _registerDto = new RegisterDto { Username = "test", Email = "test@example.com", Password = "Password123*", Role = "User" };
         private readonly LoginDto _loginDto = new LoginDto { Email = "test@example.com", Password = "Password123*" };
         private readonly User _user = new User { Email = "test@example.com", PasswordHash = "Password123*" };
 
-        public UserServiceTests()
+        public AuthServiceTests()
         {
             _mockTokenService = new Mock<ITokenService>();
-            _mockCustomUserManager = new Mock<ICustomUserManager>();
-            _mockCustomRoleManager = new Mock<ICustomRoleManager>();
+            _mockCustomUserManager = new Mock<IUserManager>();
+            _mockCustomRoleManager = new Mock<IRoleManager>();
             var mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>()));
 
-            _userService = new UserService(_mockTokenService.Object, _mockCustomUserManager.Object, _mockCustomRoleManager.Object, mapper);
+            _authService = new AuthService(_mockTokenService.Object, _mockCustomUserManager.Object, _mockCustomRoleManager.Object, mapper);
         }
         
         #region Login
@@ -52,7 +51,7 @@ namespace BookingService.Testing
             _mockTokenService.Setup(tokenService => tokenService.GenerateToken(_user, roles))
                 .ReturnsAsync(validJwt);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             result.Should().Be(validJwt);
         }
@@ -66,7 +65,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
                 .ReturnsAsync(false);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             result.Should().BeNull();
         }
@@ -77,7 +76,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
                 .ReturnsAsync(null as User);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             result.Should().BeNull();
         }
@@ -85,7 +84,7 @@ namespace BookingService.Testing
         [Fact]
         public async Task LoginAsync_ShouldFindUserByEmail()
         {
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             _mockCustomUserManager.Verify(um => um.FindByEmailAsync(_loginDto.Email), Times.Once());
         }
@@ -96,7 +95,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
                 .ReturnsAsync(_user);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             _mockCustomUserManager.Verify(um => um.CheckPasswordAsync(_user, _loginDto.Password), Times.Once);
         }
@@ -110,7 +109,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
                 .ReturnsAsync(true);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             _mockCustomUserManager.Verify(um => um.GetRolesAsync(_user), Times.Once);
         }
@@ -129,7 +128,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.GetRolesAsync(_user))
                 .ReturnsAsync(roles);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             _mockTokenService.Verify(tokenService => tokenService.GenerateToken(_user, roles), Times.Once);
         }
@@ -140,7 +139,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.FindByEmailAsync(_loginDto.Email))
                 .ReturnsAsync(null as User);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             _mockCustomUserManager.Verify(um => um.CheckPasswordAsync(_user, _loginDto.Password), Times.Never);
         }
@@ -154,7 +153,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.CheckPasswordAsync(_user, _loginDto.Password))
                 .ReturnsAsync(false);
 
-            var result = await _userService.LoginAsync(_loginDto);
+            var result = await _authService.LoginAsync(_loginDto);
 
             _mockCustomUserManager.Verify(um => um.GetRolesAsync(_user), Times.Never);
         }
@@ -174,7 +173,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role))
                 .ReturnsAsync(IdentityResult.Success);
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             result.Succeeded.Should().BeTrue();
         }
@@ -185,7 +184,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
                 .ReturnsAsync(IdentityResult.Failed());
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             result.Succeeded.Should().BeFalse();
         }
@@ -199,7 +198,7 @@ namespace BookingService.Testing
             _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
                 .ReturnsAsync(false);
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             result.Succeeded.Should().BeFalse();
         }
@@ -216,14 +215,14 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role))
                 .ReturnsAsync(IdentityResult.Failed());
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             result.Succeeded.Should().BeFalse();
         }
 
         public async Task RegisterAsync_ShouldCreateUser()
         {
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             _mockCustomUserManager.Verify(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password), Times.Once);
         }
@@ -234,7 +233,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
                 .ReturnsAsync(IdentityResult.Success);
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             _mockCustomRoleManager.Verify(rm => rm.RoleExistsAsync(_registerDto.Role), Times.Once);
         }
@@ -248,7 +247,7 @@ namespace BookingService.Testing
             _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
                 .ReturnsAsync(true);
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             _mockCustomUserManager.Verify(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role), Times.Once);
         }
@@ -259,7 +258,7 @@ namespace BookingService.Testing
             _mockCustomUserManager.Setup(um => um.CreateAsync(It.IsAny<User>(), _registerDto.Password))
                 .ReturnsAsync(IdentityResult.Failed());
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             _mockCustomRoleManager.Verify(rm => rm.RoleExistsAsync(_registerDto.Role), Times.Never);
         }
@@ -273,7 +272,7 @@ namespace BookingService.Testing
             _mockCustomRoleManager.Setup(rm => rm.RoleExistsAsync(_registerDto.Role))
                 .ReturnsAsync(false);
 
-            var result = await _userService.RegisterAsync(_registerDto);
+            var result = await _authService.RegisterAsync(_registerDto);
 
             _mockCustomUserManager.Verify(um => um.AddToRoleAsync(It.IsAny<User>(), _registerDto.Role), Times.Never);
         }

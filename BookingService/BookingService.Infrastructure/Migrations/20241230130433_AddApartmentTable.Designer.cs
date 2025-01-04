@@ -4,6 +4,7 @@ using BookingService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241230130433_AddApartmentTable")]
+    partial class AddApartmentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace BookingService.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BookingService.Domain.Entities.Apartment", b =>
+            modelBuilder.Entity("BookingService.Domain.Models.Apartment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,60 +37,21 @@ namespace BookingService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HostId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.Property<int>("RoomNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HostId");
-
                     b.ToTable("Apartments");
                 });
 
-            modelBuilder.Entity("BookingService.Domain.Entities.Booking", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ApartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApartmentId");
-
-                    b.HasIndex("ClientId");
-
-                    b.ToTable("Bookings");
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.User", b =>
+            modelBuilder.Entity("BookingService.Domain.Models.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -152,29 +116,6 @@ namespace BookingService.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("BookingService.Domain.Entities.Wallet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Wallets");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -204,19 +145,19 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6f4da681-bcd5-47e5-9abf-125351ea0cd2",
+                            Id = "b8224318-201c-4094-80d3-472141d9baab",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3d88752b-0276-4c1c-89aa-428af122fb4f",
+                            Id = "e10a8fac-1d9e-47d6-9ed1-b6e55d067140",
                             Name = "Host",
                             NormalizedName = "HOST"
                         },
                         new
                         {
-                            Id = "3ac52668-7612-4dab-8903-1a863ca1c2d2",
+                            Id = "a1e5fa57-141c-401e-bf45-7bd5c5ec9aca",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -328,47 +269,6 @@ namespace BookingService.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BookingService.Domain.Entities.Apartment", b =>
-                {
-                    b.HasOne("BookingService.Domain.Entities.User", "Host")
-                        .WithMany("Apartments")
-                        .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Host");
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.Booking", b =>
-                {
-                    b.HasOne("BookingService.Domain.Entities.Apartment", "Apartment")
-                        .WithMany("Bookings")
-                        .HasForeignKey("ApartmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("BookingService.Domain.Entities.User", "Client")
-                        .WithMany("ClientBookings")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Apartment");
-
-                    b.Navigation("Client");
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.Wallet", b =>
-                {
-                    b.HasOne("BookingService.Domain.Entities.User", "User")
-                        .WithOne("Wallet")
-                        .HasForeignKey("BookingService.Domain.Entities.Wallet", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -380,7 +280,7 @@ namespace BookingService.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("BookingService.Domain.Entities.User", null)
+                    b.HasOne("BookingService.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -389,7 +289,7 @@ namespace BookingService.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("BookingService.Domain.Entities.User", null)
+                    b.HasOne("BookingService.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -404,7 +304,7 @@ namespace BookingService.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookingService.Domain.Entities.User", null)
+                    b.HasOne("BookingService.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -413,25 +313,11 @@ namespace BookingService.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("BookingService.Domain.Entities.User", null)
+                    b.HasOne("BookingService.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.Apartment", b =>
-                {
-                    b.Navigation("Bookings");
-                });
-
-            modelBuilder.Entity("BookingService.Domain.Entities.User", b =>
-                {
-                    b.Navigation("Apartments");
-
-                    b.Navigation("ClientBookings");
-
-                    b.Navigation("Wallet");
                 });
 #pragma warning restore 612, 618
         }
