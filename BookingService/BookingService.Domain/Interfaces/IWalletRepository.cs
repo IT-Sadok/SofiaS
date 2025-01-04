@@ -4,8 +4,8 @@ namespace BookingService.Domain.Interfaces
 {
     public interface IWalletRepository
     {
-        Task<Wallet?> FindWalletByUserIdAsync(string userId);
+        Task<Wallet?> FindByUserIdAsync(string userId);
         Task UpdateAsync(Wallet wallet);
-        Task UpdateAsyncByUserId(string userId);
+        Task UpdateAsync(string userId);
     }
 }

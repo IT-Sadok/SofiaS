@@ -12,10 +12,11 @@ namespace BookingService.Infrastructure.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task CreateBookingAsync(Booking booking)
+        public async Task<int> CreateAsync(Booking booking)
         {
             await _dbContext.Bookings.AddAsync(booking);
             await _dbContext.SaveChangesAsync();
+            return booking.Id;
         }
     }
 }

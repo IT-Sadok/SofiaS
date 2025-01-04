@@ -13,14 +13,14 @@ namespace BookingService.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<int> AddApartmentAsync(Apartment apartment)
+        public async Task<int> CreateAsync(Apartment apartment)
         {
             await _context.Apartments.AddAsync(apartment);
             await _context.SaveChangesAsync();
             return apartment.Id;
         }
 
-        public async Task<Apartment?> FindApartmentByIdAsync(int apartmentId)
+        public async Task<Apartment?> FindByIdAsync(int apartmentId)
         {
             return await _context.Apartments.FindAsync(apartmentId);
         }
@@ -32,6 +32,17 @@ namespace BookingService.Infrastructure.Repository
                 _context.Apartments.Update(apartment);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public bool IsAvailable(int apartmentId, DateTime startDate, DateTime endDate)
+        {
+            //find intersection
+            var bookings = _context.Bookings
+                                .Where(a => a.ApartmentId == apartmentId
+                                    && a.EndDate > startDate
+                                    && a.StartDate < endDate)
+                                .ToList(); 
+            return !bookings.Any();
         }
     }
 }

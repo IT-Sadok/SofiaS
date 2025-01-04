@@ -23,7 +23,7 @@ namespace BookingService.Application.Services
                 return Result.Failure($"User with id {userId} was not found");
             }
 
-            var wallet = await _walletRepository.FindWalletByUserIdAsync(userId);
+            var wallet = await _walletRepository.FindByUserIdAsync(userId);
             if (wallet == null)
             {
                 return Result.Failure($"User with id {userId} doesn't have wallet");

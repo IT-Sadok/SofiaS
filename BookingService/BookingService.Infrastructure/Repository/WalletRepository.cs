@@ -14,10 +14,16 @@ namespace BookingService.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<Wallet?> FindWalletByUserIdAsync(string userId)
+        public async Task<Wallet?> FindByUserIdAsync(string userId)
         {
             return await _context.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
-            //TODO: think about what to use Find, FirstOrDefault,...
+        }
+
+        public async Task<List<Wallet>> FindByUserIdsAsync(params string[] userIds)
+        {
+            return await _context.Wallets
+                .Where(w => userIds.Contains(w.UserId))
+                .ToListAsync();
         }
 
         public async Task UpdateAsync(Wallet wallet)
@@ -29,9 +35,9 @@ namespace BookingService.Infrastructure.Repository
             }
         }
 
-        public async Task UpdateAsyncByUserId(string userId)
+        public async Task UpdateAsync(string userId)
         {
-            var wallet = await FindWalletByUserIdAsync(userId);
+            var wallet = await FindByUserIdAsync(userId);
             if (wallet != null)
             {
                 _context.Wallets.Update(wallet);

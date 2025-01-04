@@ -4,6 +4,6 @@ namespace BookingService.Domain.Interfaces
 {
     public interface IBookingRepository
     {
-        Task CreateBookingAsync(Booking booking);
+        Task<int> CreateAsync(Booking booking);
     }
 }

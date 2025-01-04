@@ -21,7 +21,7 @@ namespace BookingService.Application.Services
         {
             var apartment = _mapper.Map<Apartment>(apartmentDto);
             apartment.HostId = hostId;
-            int id = await _apartmentRepository.AddApartmentAsync(apartment);
+            int id = await _apartmentRepository.CreateAsync(apartment);
             return Result<int>.Success(id);
         }
     }
