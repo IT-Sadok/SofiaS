@@ -2,6 +2,6 @@
 {
     public record WalletTopUpDto
     {
-        public double Amount { get; init; }
+        public decimal Amount { get; init; }
     }
 }

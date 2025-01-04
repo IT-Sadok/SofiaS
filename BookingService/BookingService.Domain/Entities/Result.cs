@@ -14,7 +14,7 @@
         public T? Value { get; private set;}
 
         public static Result<T> Success(T value) => new Result<T> { IsSuccess = true, Value = value };
-        public new Result<T> Failure(string errorMessage) => new Result<T> { IsSuccess = false, ErrorMessage = errorMessage };
+        public new static Result<T> Failure(string errorMessage) => new Result<T> { IsSuccess = false, ErrorMessage = errorMessage };
 
     }
 }

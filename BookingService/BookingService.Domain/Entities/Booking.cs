@@ -3,15 +3,13 @@
     public class Booking
     {
         public int Id { get; set; }
-        public string HostId { get; set; }
-        public string TenantId { get; set; }
+        public string ClientId { get; set; }
         public int ApartmentId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public double TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
 
-        public User Host { get; set; }
-        public User Tenant { get; set; }
+        public User Client { get; set; }
         public Apartment Apartment { get; set; }
     }
 }

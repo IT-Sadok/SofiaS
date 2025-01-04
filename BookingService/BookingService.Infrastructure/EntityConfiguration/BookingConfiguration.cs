@@ -9,14 +9,9 @@ namespace BookingService.Infrastructure.EntityConfiguration
         public void Configure(EntityTypeBuilder<Booking> builder)
         {
             builder
-                .HasOne(b => b.Host)
-                .WithMany(u => u.HostBookings)
-                .HasForeignKey(b => b.HostId)
-                .OnDelete(DeleteBehavior.NoAction);
-            builder
-                .HasOne(b => b.Tenant)
-                .WithMany(u => u.TenantBookings)
-                .HasForeignKey(b => b.TenantId)
+                .HasOne(b => b.Client)
+                .WithMany(u => u.ClientBookings)
+                .HasForeignKey(b => b.ClientId)
                 .OnDelete(DeleteBehavior.NoAction);
             builder
                 .HasOne(b => b.Apartment)

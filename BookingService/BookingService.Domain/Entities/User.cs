@@ -6,7 +6,6 @@ namespace BookingService.Domain.Entities
     {
         public Wallet? Wallet { get; set; }
         public ICollection<Apartment> Apartments { get; set; }
-        public ICollection<Booking> TenantBookings { get; set; }
-        public ICollection<Booking> HostBookings { get; set; }
+        public ICollection<Booking> ClientBookings { get; set; }
     }
 }
