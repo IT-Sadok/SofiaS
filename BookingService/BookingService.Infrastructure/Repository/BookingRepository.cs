@@ -15,7 +15,6 @@ namespace BookingService.Infrastructure.Repository
         public async Task<int> CreateAsync(Booking booking)
         {
             await _dbContext.Bookings.AddAsync(booking);
-            await _dbContext.SaveChangesAsync();
             return booking.Id;
         }
     }

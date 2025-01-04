@@ -8,83 +8,80 @@ namespace BookingService.Application.Services
 {
     public class RentalService : IRentalService
     {
-        private readonly IBookingRepository _bookingRepository;
-        private readonly IApartmentRepository _apartmentRepository;
-        private readonly IWalletRepository _walletRepository;
-        private readonly IUserManager _userManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public RentalService(
-            IBookingRepository bookingRepository,
-            IApartmentRepository apartmentRepository,
-            IWalletRepository walletRepository,
-            IUserManager userManager,
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
-        {
-            _bookingRepository = bookingRepository;
-            _apartmentRepository = apartmentRepository;
-            _walletRepository = walletRepository;
-            _userManager = userManager;
+        public RentalService(IUnitOfWork unitOfWork,IMapper mapper)
+        { 
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<Result> CreateBooking(string tenantId, BookingCreateDto bookingCreateDto)
+        public async Task<Result<int>> CreateBooking(string clientId, BookingCreateDto bookingCreateDto)
         {
-            var apartment = await _apartmentRepository.FindApartmentByIdAsync(bookingCreateDto.ApartmentId);
+            var apartmentId = bookingCreateDto.ApartmentId;
+            var startDate = bookingCreateDto.StartDate;
+            var endDate = bookingCreateDto.EndDate;
+
+            var apartment = await _unitOfWork.ApartmentRepository.FindByIdAsync(apartmentId);
             if (apartment == null)
             {
-                return Result.Failure($"Apartment is not found.");
+                return Result<int>.Failure($"Apartment is not found.");
             }
-            if (!apartment.IsAvailable)
+            if (!_unitOfWork.ApartmentRepository.IsAvailable(apartmentId, startDate, endDate))
             {
-                return Result.Failure("Apartment is not available.");
+                return Result<int>.Failure("Apartment is not available for this date.");
             }
             var hostId = apartment.HostId;
-            var rentalDuration = Math.Abs((bookingCreateDto.EndDate - bookingCreateDto.StartDate).Days) + 1; //include endDate
+            var rentalDuration = Math.Abs((endDate - startDate).Days) + 1;
             var totalPrice = apartment.Price * rentalDuration;
 
-            var tenant = await _userManager.FindByIdAsync(tenantId);
-            var host = await _userManager.FindByIdAsync(hostId);
-            if (tenant == null || host == null)
+            var users = await _unitOfWork.UserManager.FindByIdsAsync(clientId, hostId);
+            var client = users.FirstOrDefault(u => u.Id == clientId);
+            var host = users.FirstOrDefault(u => u.Id == hostId);
+
+            if (client == null || host == null)
             {
-                return Result.Failure("Host or tenant is not found.");
+                return Result<int>.Failure("Host or client is not found.");
             }
-            if (tenant?.Wallet?.Balance < totalPrice)
+            var wallets = await _unitOfWork.WalletRepository.FindByUserIdsAsync(clientId, hostId);
+            var clientWallet = wallets.FirstOrDefault(w => w.UserId == clientId);
+            var hostWallet = wallets.FirstOrDefault(w => w.UserId == hostId);
+
+            if (clientWallet == null || hostWallet == null)
             {
-                return Result.Failure("Not enough money on the balance");
+                return Result<int>.Failure("Client or host wallet is not found.");
             }
-            var tenantWallet = await _walletRepository.FindWalletByUserIdAsync(tenantId);
-            var hostWallet = await _walletRepository.FindWalletByUserIdAsync(hostId);
 
-            using (_unitOfWork.BeginTransactionAsync())
+            if (clientWallet.Balance < totalPrice)
             {
-                try
-                {
-                    hostWallet.Balance += totalPrice;
-                    tenantWallet.Balance -= totalPrice;
+                return Result<int>.Failure("Not enough money on the balance");
+            }
 
-                    await _walletRepository.UpdateAsync(hostWallet);
-                    await _walletRepository.UpdateAsync(tenantWallet);
+            await _unitOfWork.BeginTransactionAsync();
+            
+            try
+            {
+                hostWallet.Balance += totalPrice;
+                clientWallet.Balance -= totalPrice;
 
-                    var booking = _mapper.Map<Booking>(bookingCreateDto);
-                    booking.TotalPrice = totalPrice;
-                    booking.HostId = hostId;
-                    booking.TenantId = tenantId;
-                    apartment.IsAvailable = false;
+                await _unitOfWork.WalletRepository.UpdateAsync(hostWallet);
+                await _unitOfWork.WalletRepository.UpdateAsync(clientWallet);
 
-                    await _apartmentRepository.UpdateAsync(apartment);
-                    await _bookingRepository.CreateBookingAsync(booking);
-                    await _unitOfWork.CommitAsync();
-                    return Result.Success();
-                }
-                catch (Exception ex)
-                {
-                    await _unitOfWork.RollbackAsync();
-                    return Result.Failure(ex.ToString());
+                var booking = _mapper.Map<Booking>(bookingCreateDto);
+                booking.TotalPrice = totalPrice;
+                booking.ClientId = clientId;
 
-                }
+                var bookingId = await _unitOfWork.BookingRepository.CreateAsync(booking);
+
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
+                return Result<int>.Success(bookingId);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackAsync();
+                return Result<int>.Failure(ex.ToString());
+
             }
         }
     }

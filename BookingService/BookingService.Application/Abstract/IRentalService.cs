@@ -5,6 +5,6 @@ namespace BookingService.Application.Abstract
 {
     public interface IRentalService
     {
-        Task<Result> CreateBooking(string tenantId, BookingCreateDto bookingCreateDto);
+        Task<Result<int>> CreateBooking(string clientId, BookingCreateDto bookingCreateDto);
     }
 }

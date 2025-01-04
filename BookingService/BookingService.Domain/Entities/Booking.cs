@@ -6,7 +6,7 @@
         public string ClientId { get; set; }
         public int ApartmentId { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; set; } //include endDate
         public decimal TotalPrice { get; set; }
 
         public User Client { get; set; }

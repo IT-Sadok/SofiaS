@@ -1,6 +1,7 @@
 ﻿using BookingService.Domain.Entities;
 using BookingService.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookingService.Infrastructure.IdentityServices
 {
@@ -42,5 +43,11 @@ namespace BookingService.Infrastructure.IdentityServices
             return await _userManager.GetRolesAsync(user);
         }
 
+        public async Task<List<User>> FindByIdsAsync(params string[] userIds)
+        {
+            return await _userManager.Users
+                .Where(u => userIds.Contains(u.Id))
+                .ToListAsync();
+        }
     }
 }

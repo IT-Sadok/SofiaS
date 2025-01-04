@@ -7,5 +7,6 @@ namespace BookingService.Domain.Interfaces
         public Task<int> CreateAsync(Apartment apartment);
         Task<Apartment?> FindByIdAsync(int apartmentId);
         Task UpdateAsync(Apartment apartment);
+        bool IsAvailable(int apartmentId, DateTime startDate, DateTime endDate);
     }
 }
