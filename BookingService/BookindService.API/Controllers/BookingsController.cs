@@ -3,6 +3,7 @@ using BookingService.Application.DTOs;
 using BookingService.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookingService.API.Controllers
 {
@@ -21,17 +22,21 @@ namespace BookingService.API.Controllers
         [Authorize(Roles = Roles.User)]
         public async Task<ActionResult> CreateBooking([FromBody] BookingCreateDto bookingDto)
         {
-            var userId = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
-                return BadRequest("User is not authorized");
+                return BadRequest("Unable to identify the user from the provided token.");
             }
             var result = await _rentalService.CreateBooking(userId, bookingDto);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.ErrorMessage);
             }
-            return Ok("Booking is successfully made");
+
+            return Ok(new { 
+                BookingId = result.Value, 
+                Message = "Booking is successfully made." 
+            });
         }
     }
 }

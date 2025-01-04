@@ -18,24 +18,17 @@ namespace BookingService.API.Controllers
         }
 
 
-        [HttpPost("/wallet/top-up")]
+        [HttpPost("/{userId}/wallet/top-up")]
         [Authorize(Roles = Roles.User)]
-        public async Task<ActionResult> TopUpBalance([FromBody] WalletTopUpDto walletTopUpDto)
+        public async Task<ActionResult> TopUpBalance(string userId, [FromBody] WalletTopUpDto walletTopUpDto)
         {
-            var userId = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
-            if (userId == null)
-            {
-                return BadRequest();
-            }
-
             var result = await _userService.TopUpBalance(userId, walletTopUpDto);
             if (!result.IsSuccess)
             {
                 return BadRequest(result.ErrorMessage);
             }
 
-            return Ok("Balance successfully was topped up");
+            return Ok(new { Message = "Balance successfully was topped up." });
         }
-
     }
 }
