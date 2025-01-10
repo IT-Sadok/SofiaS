@@ -1,0 +1,135 @@
+[
+  {
+    "Id": "1a2b3c4d",
+    "Username": "user1",
+    "Email": "user1@example.com",
+    "Apartments": [
+      {
+        "Id": "a1b2c3d4",
+        "Name": "Sunset View",
+        "Address": "123 Beach Ave, City A",
+        "Price": 1500.00,
+        "RoomNumber": 3
+      },
+      {
+        "Id": "a2b3c4d5",
+        "Name": "Lakefront Escape",
+        "Address": "456 Lake Rd, City B",
+        "Price": 2000.00,
+        "RoomNumber": 4
+      }
+    ]
+  },
+  {
+    "Id": "2a3b4c5d",
+    "Username": "user2",
+    "Email": "user2@example.com",
+    "Apartments": [
+      {
+        "Id": "b1c2d3e4",
+        "Name": "Downtown Loft",
+        "Address": "789 Main St, City C",
+        "Price": 1800.00,
+        "RoomNumber": 2
+      }
+    ]
+  },
+  {
+    "Id": "3a4b5c6d",
+    "Username": "user3",
+    "Email": "user3@example.com",
+    "Apartments": [
+      {
+        "Id": "c1d2e3f4",
+        "Name": "Mountain Retreat",
+        "Address": "101 Mountain Rd, City D",
+        "Price": 2500.00,
+        "RoomNumber": 5
+      }
+    ]
+  },
+  {
+    "Id": "4a5b6c7d",
+    "Username": "user4",
+    "Email": "user4@example.com",
+    "Apartments": [
+      {
+        "Id": "d1e2f3g4",
+        "Name": "City Center Pad",
+        "Address": "202 City Blvd, City E",
+        "Price": 2200.00,
+        "RoomNumber": 2
+      }
+    ]
+  },
+  {
+    "Id": "5a6b7c8d",
+    "Username": "user5",
+    "Email": "user5@example.com",
+    "Apartments": [
+      {
+        "Id": "e1f2g3h4",
+        "Name": "Suburban Home",
+        "Address": "303 Suburb Rd, City F",
+        "Price": 1200.00,
+        "RoomNumber": 3
+      }
+    ]
+  },
+  {
+    "Id": "6a7b8c9d",
+    "Username": "user6",
+    "Email": "user6@example.com",
+    "Apartments": [
+      {
+        "Id": "f1g2h3i4",
+        "Name": "Coastal Cottage",
+        "Address": "404 Coast Ave, City G",
+        "Price": 1750.00,
+        "RoomNumber": 2
+      }
+    ]
+  },
+  {
+    "Id": "7a8b9c0d",
+    "Username": "user7",
+    "Email": "user7@example.com",
+    "Apartments": [
+      {
+        "Id": "g1h2i3j4",
+        "Name": "Urban Studio",
+        "Address": "505 Urban St, City H",
+        "Price": 1400.00,
+        "RoomNumber": 1
+      },
+      {
+        "Id": "h1i2j3k4",
+        "Name": "Lakeview Condo",
+        "Address": "606 Lake St, City I",
+        "Price": 1600.00,
+        "RoomNumber": 3
+      }
+    ]
+  },
+  {
+    "Id": "9a0b1c2d",
+    "Username": "user9",
+    "Email": "user9@example.com",
+    "Apartments": [
+      {
+        "Id": "i1j2k3l4",
+        "Name": "Skyline Penthouse",
+        "Address": "707 Skyline Dr, City J",
+        "Price": 3000.00,
+        "RoomNumber": 6
+      },
+      {
+        "Id": "j1k2l3m4",
+        "Name": "Quiet Retreat",
+        "Address": "808 Quiet Ln, City K",
+        "Price": 1300.00,
+        "RoomNumber": 2
+      }
+    ]
+  }
+]
