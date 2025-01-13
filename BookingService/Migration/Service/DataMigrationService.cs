@@ -3,6 +3,7 @@ using BookingService.Domain.Constants;
 using BookingService.Domain.Entities;
 using BookingService.Domain.Interfaces;
 using BookingService.Infrastructure.Database;
+using Microsoft.AspNetCore.Identity;
 using Migration.Abstract;
 using Migration.DataModels;
 using System.Text.Json;
@@ -12,13 +13,15 @@ namespace Migration.Service
     internal class DataMigrationService : IDataMigrationService
     {
         private readonly IUserManager _userManager;
+        private readonly IRoleManager _roleManager;
         private readonly IApartmentRepository _apartmentRepository;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
         private const string DefaultPassword = "DefaultPassword1*";
-        public DataMigrationService(IUserManager userManager, IApartmentRepository apartmentRepository, IMapper mapper, AppDbContext context)
+        public DataMigrationService(IUserManager userManager, IRoleManager roleManager, IApartmentRepository apartmentRepository, IMapper mapper, AppDbContext context)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _apartmentRepository = apartmentRepository;
             _mapper = mapper;
             _context = context;
@@ -37,12 +40,12 @@ namespace Migration.Service
 
             try
             {
-                var migrationResult = await UserDataMigration(data);
+                var migrationResult = await MigrateUserData(data);
                 if (!migrationResult.IsSuccess)
                 {
                     throw new Exception(migrationResult.ErrorMessage);
                 }
-                //await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return Result.Success();
             }
@@ -53,7 +56,7 @@ namespace Migration.Service
             }
         }
 
-        private async Task<Result> UserDataMigration(string data)
+        private async Task<Result> MigrateUserData(string data)
         {
             var hostsData = JsonSerializer.Deserialize<List<UserDataModel>>(data);
             if (hostsData == null)
@@ -61,29 +64,36 @@ namespace Migration.Service
                 return Result.Failure("There is no data in file");
             }
 
-            foreach (var hostData in hostsData)
+            var hosts = _mapper.Map<List<User>>(hostsData);
+            var userRoles = new List<IdentityUserRole<string>>();
+
+            var hostRole = await _roleManager.FindByName(Roles.Host);
+            var hostRoleId = hostRole.Id;
+
+            foreach (var host in hosts)
             {
-                var host = _mapper.Map<User>(hostData);
+                userRoles.Add(new IdentityUserRole<string>()
+                {
+                    UserId = host.Id,
+                    RoleId = hostRoleId
+                });
+
+                foreach (var apartment in host.Apartments)
+                {
+                    apartment.Host = host;
+                }
+
                 var creationResult = await _userManager.CreateAsync(host, DefaultPassword);
                 if (!creationResult.Succeeded)
                 {
                     return Result.Failure("Failure with user migration");
                 }
-                var addToRoleResult = await _userManager.AddToRoleAsync(host, Roles.Host);
-                if (!addToRoleResult.Succeeded)
-                {
-                    return Result.Failure("Failure with user adding to role");
-                }
-
-                foreach (var apartmentData in hostData.Apartments)
-                {
-                    var apartment = _mapper.Map<Apartment>(apartmentData);
-                    apartment.Host = host;
-                    await _apartmentRepository.CreateAsync(apartment);
-                }
             }
-            return Result.Success();
 
-        }    
+            await _context.UserRoles.AddRangeAsync(userRoles);
+
+
+            return Result.Success();
+        }
     }
 }

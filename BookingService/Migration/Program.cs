@@ -63,6 +63,7 @@ internal class Program
                         .AddDefaultTokenProviders();
 
                     services.AddScoped<IUserManager, UserManagerWrapper>();
+                    services.AddScoped<IRoleManager, RoleManagerWrapper>();
                     services.AddScoped<IApartmentRepository, ApartmentRepository>();
                     services.AddAutoMapper(typeof(MapperProfile));
                     services.AddScoped<IDataMigrationService, DataMigrationService>();
