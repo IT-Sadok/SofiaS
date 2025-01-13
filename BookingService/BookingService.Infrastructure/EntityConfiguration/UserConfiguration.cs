@@ -11,7 +11,11 @@ namespace BookingService.Infrastructure.EntityConfiguration
             builder
                 .HasOne(w => w.Wallet)
                 .WithOne(u => u.User)
-                .HasForeignKey<Wallet>(u => u.UserId);
+                .HasForeignKey<Wallet>(u => u.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //builder.HasIndex(x => x.ExternalId)
+            //    .IsUnique();
         }
     }
 }

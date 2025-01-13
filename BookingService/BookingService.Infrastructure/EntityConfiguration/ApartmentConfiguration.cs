@@ -13,10 +13,15 @@ namespace BookingService.Infrastructure.ModelConfiguration
 
             builder.Property(x => x.Address)
                 .IsRequired();
+
+            //builder.HasIndex(x => x.ExternalId)
+            //    .IsUnique();
+
             builder
-                .HasOne(a => a.Host)
-                .WithMany(u => u.Apartments)
-                .HasForeignKey(a => a.HostId);
+                 .HasOne(a => a.Host)
+                 .WithMany(u => u.Apartments)
+                 .HasForeignKey(a => a.HostId)
+                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

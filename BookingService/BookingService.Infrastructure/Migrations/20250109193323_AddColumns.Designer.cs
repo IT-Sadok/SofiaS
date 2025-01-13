@@ -4,6 +4,7 @@ using BookingService.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250109193323_AddColumns")]
+    partial class AddColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,19 +215,19 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "27588c98-19b4-4411-9494-a1056ed504f6",
+                            Id = "309857a9-581c-4858-bc14-b55a9d169e28",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "89ed77b6-2e39-426c-b753-078c50a8a536",
+                            Id = "e5554ba3-b449-492b-8245-8d8cce20eded",
                             Name = "Host",
                             NormalizedName = "HOST"
                         },
                         new
                         {
-                            Id = "b5059b44-2635-43bc-88ea-b91fc0e3c1ff",
+                            Id = "53cfe11d-8c15-41fb-94cb-db61a82bf45c",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -358,7 +361,7 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasOne("BookingService.Domain.Entities.User", "Client")
                         .WithMany("ClientBookings")
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Apartment");
