@@ -5,6 +5,7 @@ using BookingService.Infrastructure.IdentityServices;
 using BookingService.Infrastructure.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Migration.Abstract;
@@ -26,36 +27,43 @@ internal class Program
         {
             var services = scope.ServiceProvider;
 
-        try
-        {
-            var migrationService = host.Services.GetRequiredService<IDataMigrationService>();
-            string filePath = "Files/data.json";
-            var result = await migrationService.MigrateData(filePath);
+            try
+            {
+                var dataMigrationService = services.GetRequiredService<IDataMigrationService>();
+                var configuration = services.GetRequiredService<IConfiguration>();
+                string filePath = configuration["FilePaths:UserDataFilePath"];
 
-            if (result.IsSuccess)
-            {
+                var result = await dataMigrationService.MigrateData(filePath);
+
+                if (result.IsSuccess)
+                {
                     Log.Information("Data migration succeeded.");
-            }
-            else
-            {
+                }
+                else
+                {
                     Log.Error($"Data migration failed: {result.ErrorMessage}");
+                }
             }
-        }
-        catch (Exception ex)
-        {
+            catch (Exception ex)
+            {
                 Log.Error($"An error occurred: {ex.Message}");
-        }
-    
+            }
+
             Log.CloseAndFlush();
         }
-
+    
         static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+                    config.AddJsonFile(path, optional: false, reloadOnChange: true);
+                })
                 .ConfigureServices((context, services) =>
                 {
                     services.AddDbContext<AppDbContext>(options =>
-                        options.UseSqlServer("Data Source=DESKTOP-VM12JTU;Initial Catalog=BookingService;Integrated Security=True;TrustServerCertificate=True;Encrypt=False"));
+                        options.UseSqlServer(context.Configuration.GetConnectionString("DefaultConnection")));
                     services.AddDataProtection();
                     services.AddIdentityCore<User>()
                         .AddRoles<IdentityRole>()
