@@ -10,12 +10,21 @@ using Microsoft.Extensions.Hosting;
 using Migration.Abstract;
 using Migration.Mapping;
 using Migration.Service;
+using Serilog;
 
 internal class Program
 {
     private async static Task Main(string[] args)
     {
         var host = CreateHostBuilder(args).Build();
+
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()  
+            .CreateLogger();
+
+        using (var scope = host.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
 
         try
         {
@@ -25,19 +34,20 @@ internal class Program
 
             if (result.IsSuccess)
             {
-                Console.WriteLine("Data migration successful.");
+                    Log.Information("Data migration succeeded.");
             }
             else
             {
-                Console.WriteLine($"Data migration failed: {result.ErrorMessage}");
+                    Log.Error($"Data migration failed: {result.ErrorMessage}");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+                Log.Error($"An error occurred: {ex.Message}");
         }
     
-
+            Log.CloseAndFlush();
+        }
 
         static IHostBuilder CreateHostBuilder(string[] args)
         {
