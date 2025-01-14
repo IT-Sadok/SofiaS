@@ -12,7 +12,7 @@ namespace BookingService.Infrastructure.EntityConfiguration
                 .HasOne(b => b.Client)
                 .WithMany(u => u.ClientBookings)
                 .HasForeignKey(b => b.ClientId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
             builder
                 .HasOne(b => b.Apartment)
                 .WithMany(a => a.Bookings)

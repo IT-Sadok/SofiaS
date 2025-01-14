@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.Application"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.Infrastructure", "BookingService.Infrastructure\BookingService.Infrastructure.csproj", "{09266F17-A1D4-4FC9-BE4E-CBA6539D9D46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingService.Testing", "BookingService.Testing\BookingService.Testing.csproj", "{86502608-81F3-4588-B45D-B477CB6AA752}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.Testing", "BookingService.Testing\BookingService.Testing.csproj", "{86502608-81F3-4588-B45D-B477CB6AA752}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migration", "Migration\Migration.csproj", "{68DBD49A-C69A-475E-9EC2-FDC38DDF3967}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{86502608-81F3-4588-B45D-B477CB6AA752}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86502608-81F3-4588-B45D-B477CB6AA752}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86502608-81F3-4588-B45D-B477CB6AA752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68DBD49A-C69A-475E-9EC2-FDC38DDF3967}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68DBD49A-C69A-475E-9EC2-FDC38DDF3967}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68DBD49A-C69A-475E-9EC2-FDC38DDF3967}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68DBD49A-C69A-475E-9EC2-FDC38DDF3967}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
