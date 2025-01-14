@@ -65,14 +65,12 @@ namespace Migration.Service
             }
 
             var hosts = _mapper.Map<List<User>>(hostsData);
-            var userRoles = new List<IdentityUserRole<string>>();
-
             var hostRole = await _roleManager.FindByName(Roles.Host);
             var hostRoleId = hostRole.Id;
 
             foreach (var host in hosts)
             {
-                userRoles.Add(new IdentityUserRole<string>()
+                host.UserRoles.Add(new IdentityUserRole<string>()
                 {
                     UserId = host.Id,
                     RoleId = hostRoleId
@@ -89,8 +87,6 @@ namespace Migration.Service
                     return Result.Failure("Failure with user migration");
                 }
             }
-
-            await _context.UserRoles.AddRangeAsync(userRoles);
 
 
             return Result.Success();

@@ -17,9 +17,9 @@ namespace BookingService.Infrastructure.IdentityServices
             return await _roleManager.RoleExistsAsync(roleName);
         }
         
-        public async Task<IdentityRole?> FindByName(string roleName)
+        public async Task<IdentityRole> FindByName(string roleName)
         {
-            return await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+            return await _roleManager.Roles.SingleAsync(r => r.Name == roleName);
         }
     }
 }
