@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingService.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250102205826_AddConstraintsBookingApartment")]
-    partial class AddConstraintsBookingApartment
+    [Migration("20250117120948_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,23 +37,27 @@ namespace BookingService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("HostId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RoomNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExternalId")
+                        .IsUnique()
+                        .HasFilter("[ExternalId] IS NOT NULL");
 
                     b.HasIndex("HostId");
 
@@ -68,33 +72,26 @@ namespace BookingService.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApartmentId")
+                    b.Property<int?>("ApartmentId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HostId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<double>("TotalPrice")
-                        .HasColumnType("float");
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApartmentId");
 
-                    b.HasIndex("HostId");
-
-                    b.HasIndex("TenantId");
+                    b.HasIndex("ClientId");
 
                     b.ToTable("Bookings");
                 });
@@ -117,6 +114,9 @@ namespace BookingService.Infrastructure.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -153,6 +153,10 @@ namespace BookingService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ExternalId")
+                        .IsUnique()
+                        .HasFilter("[ExternalId] IS NOT NULL");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -172,8 +176,8 @@ namespace BookingService.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("Balance")
-                        .HasColumnType("float");
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -216,19 +220,19 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "47575409-9673-4d41-9906-d010f12e6976",
+                            Id = "4b3d8121-8760-4e7a-a201-f0684ee56bb1",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "2988b275-4116-4048-a617-c87dd3a2bdac",
+                            Id = "2418ca95-a923-4e9e-970a-984a04dd9ac2",
                             Name = "Host",
                             NormalizedName = "HOST"
                         },
                         new
                         {
-                            Id = "b88d87d9-b5d2-46c0-a472-7a70d57ebf21",
+                            Id = "3f5af12b-f962-447a-b60a-d31fc90c8525",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -356,26 +360,16 @@ namespace BookingService.Infrastructure.Migrations
                     b.HasOne("BookingService.Domain.Entities.Apartment", "Apartment")
                         .WithMany("Bookings")
                         .HasForeignKey("ApartmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("BookingService.Domain.Entities.User", "Host")
-                        .WithMany("HostBookings")
-                        .HasForeignKey("HostId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("BookingService.Domain.Entities.User", "Tenant")
-                        .WithMany("TenantBookings")
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.HasOne("BookingService.Domain.Entities.User", "Client")
+                        .WithMany("ClientBookings")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Apartment");
 
-                    b.Navigation("Host");
-
-                    b.Navigation("Tenant");
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("BookingService.Domain.Entities.Wallet", b =>
@@ -425,7 +419,7 @@ namespace BookingService.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("BookingService.Domain.Entities.User", null)
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -449,9 +443,9 @@ namespace BookingService.Infrastructure.Migrations
                 {
                     b.Navigation("Apartments");
 
-                    b.Navigation("HostBookings");
+                    b.Navigation("ClientBookings");
 
-                    b.Navigation("TenantBookings");
+                    b.Navigation("UserRoles");
 
                     b.Navigation("Wallet");
                 });
