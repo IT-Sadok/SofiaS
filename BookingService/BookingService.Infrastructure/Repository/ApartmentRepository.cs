@@ -53,9 +53,10 @@ namespace BookingService.Infrastructure.Repository
 
         public async Task<IEnumerable<ApartmentPriceQuantilesQueryResult>> GetPriceQuantiles()
         {
+            var sql = SqlScripts.SqlScripts.GetPriceQuantiles;
+
             await using var connection = _connection;
-            var sql = @"SELECT Id as ApartmentId, Price, NTILE(4) OVER (ORDER BY Price) AS Quantile
-                        FROM dbo.Apartments;";
+
             return await _connection.QueryAsync<ApartmentPriceQuantilesQueryResult>(sql);
         }
     }

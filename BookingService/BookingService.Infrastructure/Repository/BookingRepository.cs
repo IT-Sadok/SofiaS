@@ -27,45 +27,37 @@ namespace BookingService.Infrastructure.Repository
 
         public async Task<IEnumerable<HostsProfitQueryResult>> GetHostsProfit()
         {
+            var sql = SqlScripts.SqlScripts.GetHostsProfit;
+            
             await using var connection = _context.Database.GetDbConnection();
 
-            var sql = @"SELECT u.UserName, SUM(b.TotalPrice) as TotalIncome 
-                        FROM dbo.AspNetUsers as u 
-                        INNER JOIN dbo.Apartments as a on a.HostId = u.Id 
-                        INNER JOIN dbo.Bookings as b on a.Id = b.ApartmentId 
-                        GROUP BY u.UserName;";
             return await connection.QueryAsync<HostsProfitQueryResult>(sql);
         }
 
         public async Task<IEnumerable<BookedApartmentQueryResult>> GetTop5MostBookingApartment()
         {
+            var sql = SqlScripts.SqlScripts.GetTop5MostBookingApartment;
+
             await using var connection = _connection;
 
-            var sql = @"SELECT TOP 5 ApartmentId, COUNT(*) AS BookingCount
-                        FROM dbo.Bookings
-                        GROUP BY ApartmentId 
-                        ORDER BY BookingCount DESC;";
             return await connection.QueryAsync<BookedApartmentQueryResult>(sql);
         }
 
         public async Task<IEnumerable<RepeatedBookingQueryResult>> GetRepeatedBookingPerApartmentClient()
         {
+            var sql = SqlScripts.SqlScripts.GetRepeatedBookingPerApartmentClient;
+
             await using var connection = _connection;
 
-            var sql = @"SELECT b.ApartmentId
-                    FROM dbo.Bookings as b
-                    GROUP BY b.ApartmentId, b.ClientId
-                    HAVING COUNT(*) > 1;";
             return await connection.QueryAsync<RepeatedBookingQueryResult>(sql);
         }
 
         public async Task<IEnumerable<BookingDurationQueryResult>> GetAverageBookingDurationPerApartment()
         {
+            var sql = SqlScripts.SqlScripts.GetAverageBookingDurationPerApartment;
+
             await using var connection = _connection;
 
-            var sql = @"SELECT ApartmentId, AVG(DATEDIFF(DAY, StartDate, EndDate)) as AverageDuration
-                        FROM dbo.Bookings
-                        GROUP BY ApartmentId;";
             return await connection.QueryAsync<BookingDurationQueryResult>(sql);
         }
     }
