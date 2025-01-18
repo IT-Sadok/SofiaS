@@ -1,16 +1,22 @@
 ﻿using BookingService.Domain.Interfaces;
 using BookingService.Domain.Entities;
 using BookingService.Infrastructure.Database;
+using BookingService.Domain.DTOs;
+using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
+using Dapper;
 
 namespace BookingService.Infrastructure.Repository
 {
     public class ApartmentRepository : IApartmentRepository
     {
         private readonly AppDbContext _context;
+        private readonly DbConnection _connection;
 
         public ApartmentRepository(AppDbContext context)
         {
             _context = context;
+            _connection = _context.Database.GetDbConnection();
         }
 
         public async Task<int> CreateAsync(Apartment apartment)
@@ -43,6 +49,14 @@ namespace BookingService.Infrastructure.Repository
                                     && a.StartDate < endDate)
                                 .ToList(); 
             return !bookings.Any();
+        }
+
+        public async Task<IEnumerable<ApartmentPriceQuantilesQueryResult>> GetPriceQuantiles()
+        {
+            await using var connection = _connection;
+            var sql = @"SELECT Id as ApartmentId, Price, NTILE(4) OVER (ORDER BY Price) AS Quantile
+                        FROM dbo.Apartments;";
+            return await _connection.QueryAsync<ApartmentPriceQuantilesQueryResult>(sql);
         }
     }
 }
