@@ -9,6 +9,7 @@
         public string Address { get; set; }
         public int RoomNumber { get; set; }
         public string HostId { get; set; }
+        public string? CustomData { get; set; } //json
 
         public User Host { get; set; }
         public ICollection<Booking>? Bookings { get; set; }

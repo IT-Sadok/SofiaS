@@ -10,5 +10,6 @@ namespace BookingService.Domain.Interfaces
         Task UpdateAsync(Apartment apartment);
         bool IsAvailable(int apartmentId, DateTime startDate, DateTime endDate);
         Task<IEnumerable<ApartmentPriceQuantilesQueryResult>> GetPriceQuantiles();
+        Task UpsertCustomData(int apartmentId, string hostId, string customData);
     }
 }

@@ -26,6 +26,14 @@ namespace BookingService.Infrastructure.Repository
             return apartment.Id;
         }
 
+        public async Task UpsertCustomData(int apartmentId, string hostId, string customData)
+        {
+            var sql = SqlScripts.SqlScripts.UpsertApartmentCustomData;
+
+            await using var connection = _connection;
+            await connection.ExecuteAsync(sql, new { Id = apartmentId, HostId = hostId, CustomData = customData });
+        }
+
         public async Task<Apartment?> FindByIdAsync(int apartmentId)
         {
             return await _context.Apartments.FindAsync(apartmentId);

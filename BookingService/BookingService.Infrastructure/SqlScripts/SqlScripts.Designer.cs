@@ -117,5 +117,21 @@ namespace BookingService.Infrastructure.SqlScripts {
                 return ResourceManager.GetString("GetTop5MostBookingApartment", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MERGE INTO dbo.Apartments AS target
+        ///USING (VALUES (@Id, @HostId, @CustomData)) AS source (Id, HostId, CustomData)
+        ///ON target.Id = source.Id
+        ///WHEN MATCHED THEN
+        ///    UPDATE SET target.CustomData = source.CustomData
+        ///WHEN NOT MATCHED THEN
+        ///    INSERT (HostId, CustomData)
+        ///    VALUES (source.HostId, source.CustomData);.
+        /// </summary>
+        internal static string UpsertApartmentCustomData {
+            get {
+                return ResourceManager.GetString("UpsertApartmentCustomData", resourceCulture);
+            }
+        }
     }
 }
