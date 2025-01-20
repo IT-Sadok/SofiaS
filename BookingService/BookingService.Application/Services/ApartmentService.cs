@@ -26,10 +26,9 @@ namespace BookingService.Application.Services
             return Result<int>.Success(id);
         }
 
-        public async Task<Result> UpsertCustomDataAsync(int apartmentId, string hostId, List<ApartmentUpsertDto> customData)
+        public async Task<Result> UpsertCustomDataAsync(int apartmentId, string hostId, object customData)
         {
-            var dictionary = customData.ToDictionary(cd => cd.Key, cd => cd.Value);
-            var customDataJson = JsonSerializer.Serialize(dictionary);
+            var customDataJson = JsonSerializer.Serialize(customData);
 
             await _apartmentRepository.UpsertCustomData(apartmentId, hostId, customDataJson);
 

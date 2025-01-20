@@ -10,6 +10,6 @@ namespace BookingService.Application.Abstract
         Task<Result<IEnumerable<BookingDurationQueryResult>>> GetAverageBookingDurationPerApartment();
         Task<Result<IEnumerable<HostsProfitQueryResult>>> GetHostsProfit();
         Task<Result<IEnumerable<RepeatedBookingQueryResult>>> GetRepeatedBookingPerApartmentClient();
-        Task<Result<IEnumerable<BookedApartmentQueryResult>>> GetTop5MostBookedApartment();
+        Task<Result<IEnumerable<BookedApartmentQueryResult>>> GetTopMostBookedApartment(int n);
     }
 }

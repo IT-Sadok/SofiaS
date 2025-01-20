@@ -21,10 +21,10 @@ namespace BookingService.API.Controllers
             return Ok(result.Value.ToList());
         }
 
-        [HttpGet("top-5-apartments")]
-        public async Task<IActionResult> GetTopMostBookedApartment()
+        [HttpGet("top")]
+        public async Task<IActionResult> GetTopMostBookedApartment([FromQuery] int n)
         {
-            var result = await _statisticService.GetTop5MostBookedApartment();
+            var result = await _statisticService.GetTopMostBookedApartment(n);
             return Ok(result.Value.ToList());
         }
 

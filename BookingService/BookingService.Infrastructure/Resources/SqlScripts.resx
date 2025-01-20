@@ -143,8 +143,8 @@
                     HAVING COUNT(*) &gt; 1;</value>
     <comment>Sql script to get apartments which particular client booked more than one time </comment>
   </data>
-  <data name="GetTop5MostBookingApartment" xml:space="preserve">
-    <value>SELECT TOP 5 ApartmentId, COUNT(*) AS BookingCount
+  <data name="GetTopMostBookedApartment" xml:space="preserve">
+    <value>SELECT TOP (@N) ApartmentId, COUNT(*) AS BookingCount
                         FROM dbo.Bookings
                         GROUP BY ApartmentId 
                         ORDER BY BookingCount DESC;</value>

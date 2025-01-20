@@ -23,9 +23,9 @@ namespace BookingService.Application.Services
             return Result<IEnumerable<HostsProfitQueryResult>>.Success(hostsWithProfit);
         }
 
-        public async Task<Result<IEnumerable<BookedApartmentQueryResult>>> GetTop5MostBookedApartment()
+        public async Task<Result<IEnumerable<BookedApartmentQueryResult>>> GetTopMostBookedApartment(int n)
         {
-            var topApartments = await _bookingRepository.GetTop5MostBookingApartment();
+            var topApartments = await _bookingRepository.GetTopMostBookedApartment(n);
             return Result<IEnumerable<BookedApartmentQueryResult>>.Success(topApartments);
         }
 

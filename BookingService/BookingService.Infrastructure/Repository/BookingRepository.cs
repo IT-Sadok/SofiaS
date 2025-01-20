@@ -3,60 +3,59 @@ using BookingService.Domain.DTOs;
 using BookingService.Domain.Entities;
 using BookingService.Domain.Interfaces;
 using BookingService.Infrastructure.Database;
+using BookingService.Infrastructure.Resources;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
 
 namespace BookingService.Infrastructure.Repository
 {
     public class BookingRepository : IBookingRepository
     {
         private readonly AppDbContext _context;
-        private readonly DbConnection _connection;
 
         public BookingRepository(AppDbContext context)
         {
             _context = context;
-            _connection = _context.Database.GetDbConnection();
         }
         public async Task<int> CreateAsync(Booking booking)
         {
             await _context.Bookings.AddAsync(booking);
-            return booking.Id; //TODO: fix problem - not return new id cause there is not calling SaveChanges before
+            await _context.SaveChangesAsync();
+            return booking.Id;
         }
 
         public async Task<IEnumerable<HostsProfitQueryResult>> GetHostsProfit()
         {
-            var sql = SqlScripts.SqlScripts.GetHostsProfit;
+            var sql = SqlScripts.GetHostsProfit;
             
             await using var connection = _context.Database.GetDbConnection();
 
             return await connection.QueryAsync<HostsProfitQueryResult>(sql);
         }
 
-        public async Task<IEnumerable<BookedApartmentQueryResult>> GetTop5MostBookingApartment()
+        public async Task<IEnumerable<BookedApartmentQueryResult>> GetTopMostBookedApartment(int n)
         {
-            var sql = SqlScripts.SqlScripts.GetTop5MostBookingApartment;
+            var sql = SqlScripts.GetTopMostBookedApartment;
 
-            await using var connection = _connection;
+            await using var connection = _context.Database.GetDbConnection();
 
-            return await connection.QueryAsync<BookedApartmentQueryResult>(sql);
+            return await connection.QueryAsync<BookedApartmentQueryResult>(sql, new {N = n});
         }
 
         public async Task<IEnumerable<RepeatedBookingQueryResult>> GetRepeatedBookingPerApartmentClient()
         {
-            var sql = SqlScripts.SqlScripts.GetRepeatedBookingPerApartmentClient;
+            var sql = SqlScripts.GetRepeatedBookingPerApartmentClient;
 
-            await using var connection = _connection;
+            await using var connection = _context.Database.GetDbConnection();
 
             return await connection.QueryAsync<RepeatedBookingQueryResult>(sql);
         }
 
         public async Task<IEnumerable<BookingDurationQueryResult>> GetAverageBookingDurationPerApartment()
         {
-            var sql = SqlScripts.SqlScripts.GetAverageBookingDurationPerApartment;
+            var sql = SqlScripts.GetAverageBookingDurationPerApartment;
 
-            await using var connection = _connection;
+            await using var connection = _context.Database.GetDbConnection();
 
             return await connection.QueryAsync<BookingDurationQueryResult>(sql);
         }

@@ -1,22 +1,20 @@
-﻿using BookingService.Domain.Interfaces;
+﻿using BookingService.Domain.DTOs;
 using BookingService.Domain.Entities;
+using BookingService.Domain.Interfaces;
 using BookingService.Infrastructure.Database;
-using BookingService.Domain.DTOs;
-using System.Data.Common;
-using Microsoft.EntityFrameworkCore;
+using BookingService.Infrastructure.Resources;
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookingService.Infrastructure.Repository
 {
     public class ApartmentRepository : IApartmentRepository
     {
         private readonly AppDbContext _context;
-        private readonly DbConnection _connection;
 
         public ApartmentRepository(AppDbContext context)
         {
             _context = context;
-            _connection = _context.Database.GetDbConnection();
         }
 
         public async Task<int> CreateAsync(Apartment apartment)
@@ -28,9 +26,9 @@ namespace BookingService.Infrastructure.Repository
 
         public async Task UpsertCustomData(int apartmentId, string hostId, string customData)
         {
-            var sql = SqlScripts.SqlScripts.UpsertApartmentCustomData;
+            var sql = SqlScripts.UpsertApartmentCustomData;
 
-            await using var connection = _connection;
+            await using var connection = _context.Database.GetDbConnection();
             await connection.ExecuteAsync(sql, new { Id = apartmentId, HostId = hostId, CustomData = customData });
         }
 
@@ -61,11 +59,11 @@ namespace BookingService.Infrastructure.Repository
 
         public async Task<IEnumerable<ApartmentPriceQuantilesQueryResult>> GetPriceQuantiles()
         {
-            var sql = SqlScripts.SqlScripts.GetPriceQuantiles;
+            var sql = SqlScripts.GetPriceQuantiles;
 
-            await using var connection = _connection;
+            await using var connection = _context.Database.GetDbConnection();
 
-            return await _connection.QueryAsync<ApartmentPriceQuantilesQueryResult>(sql);
+            return await connection.QueryAsync<ApartmentPriceQuantilesQueryResult>(sql);
         }
     }
 }

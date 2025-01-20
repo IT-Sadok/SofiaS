@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BookingService.Infrastructure.SqlScripts {
+namespace BookingService.Infrastructure.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace BookingService.Infrastructure.SqlScripts {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BookingService.Infrastructure.SqlScripts.SqlScripts", typeof(SqlScripts).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BookingService.Infrastructure.Resources.SqlScripts", typeof(SqlScripts).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -107,14 +107,14 @@ namespace BookingService.Infrastructure.SqlScripts {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SELECT TOP 5 ApartmentId, COUNT(*) AS BookingCount
+        ///   Looks up a localized string similar to SELECT TOP (@N) ApartmentId, COUNT(*) AS BookingCount
         ///                        FROM dbo.Bookings
         ///                        GROUP BY ApartmentId 
         ///                        ORDER BY BookingCount DESC;.
         /// </summary>
-        internal static string GetTop5MostBookingApartment {
+        internal static string GetTopMostBookedApartment {
             get {
-                return ResourceManager.GetString("GetTop5MostBookingApartment", resourceCulture);
+                return ResourceManager.GetString("GetTopMostBookedApartment", resourceCulture);
             }
         }
         

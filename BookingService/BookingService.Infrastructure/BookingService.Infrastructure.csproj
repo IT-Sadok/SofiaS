@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="SqlScripts\SqlScripts.Designer.cs">
+    <Compile Update="Resources\SqlScripts.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>SqlScripts.resx</DependentUpon>
@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="SqlScripts\SqlScripts.resx">
+    <EmbeddedResource Update="Resources\SqlScripts.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SqlScripts.Designer.cs</LastGenOutput>
     </EmbeddedResource>
