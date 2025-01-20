@@ -37,18 +37,11 @@ namespace BookingService.API.Controllers
 
         [HttpPost("{apartmentId}")]
         [Authorize(Roles = Roles.Host)]
-        public async Task<IActionResult> UpsertCustomData(int apartmentId, [FromBody] List<ApartmentUpsertDto> customData)
+        public async Task<IActionResult> UpsertCustomData(int apartmentId, [FromBody] object customData)
         {
-            try
-            {
-                var hostId = GetUserIdFromToken();
-                var result = await _apartmentService.UpsertCustomDataAsync(apartmentId, hostId, customData);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var hostId = GetUserIdFromToken();
+            var result = await _apartmentService.UpsertCustomDataAsync(apartmentId, hostId, customData);
+            return Ok(result.IsSuccess);
         }
     }
 }

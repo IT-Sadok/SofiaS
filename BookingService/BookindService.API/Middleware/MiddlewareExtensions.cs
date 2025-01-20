@@ -8,5 +8,10 @@ namespace BookingService.API.Middleware
         {
             return builder.UseMiddleware<ValidationMiddleware>();
         }
+
+        public static IApplicationBuilder UseExceptionHandling(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<ExceptionHandlingMiddleware>();
+        }
     }
 }
