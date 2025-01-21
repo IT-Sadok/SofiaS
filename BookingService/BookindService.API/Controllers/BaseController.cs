@@ -9,7 +9,7 @@ namespace BookingService.API.Controllers
     public abstract class BaseController : ControllerBase
     {
         [Authorize]
-        protected string GetUserId()
+        protected string GetUserIdFromToken()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)

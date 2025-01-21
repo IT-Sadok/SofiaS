@@ -14,8 +14,11 @@ namespace BookingService.Infrastructure.ModelConfiguration
             builder.Property(x => x.Address)
                 .IsRequired();
 
-            //builder.HasIndex(x => x.ExternalId)
-            //    .IsUnique();
+            builder.Property(x => x.HostId)
+                .IsRequired();
+
+            builder.HasIndex(x => x.ExternalId)
+                .IsUnique();
 
             builder
                  .HasOne(a => a.Host)

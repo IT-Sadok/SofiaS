@@ -3,6 +3,7 @@ using BookingService.Application.Abstract;
 using BookingService.Application.DTOs;
 using BookingService.Domain.Interfaces;
 using BookingService.Domain.Entities;
+using System.Text.Json;
 
 namespace BookingService.Application.Services
 {
@@ -23,6 +24,15 @@ namespace BookingService.Application.Services
             apartment.HostId = hostId;
             int id = await _apartmentRepository.CreateAsync(apartment);
             return Result<int>.Success(id);
+        }
+
+        public async Task<Result> UpsertCustomDataAsync(int apartmentId, string hostId, object customData)
+        {
+            var customDataJson = JsonSerializer.Serialize(customData);
+
+            await _apartmentRepository.UpsertCustomData(apartmentId, hostId, customDataJson);
+
+            return Result.Success();
         }
     }
 }

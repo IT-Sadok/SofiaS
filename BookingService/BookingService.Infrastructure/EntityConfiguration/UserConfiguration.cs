@@ -1,5 +1,4 @@
 ﻿using BookingService.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +8,9 @@ namespace BookingService.Infrastructure.EntityConfiguration
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.HasIndex(x => x.ExternalId)
+                .IsUnique();
+
             builder
                 .HasOne(w => w.Wallet)
                 .WithOne(u => u.User)
@@ -19,9 +21,6 @@ namespace BookingService.Infrastructure.EntityConfiguration
                 .HasMany(u => u.UserRoles)
                 .WithOne()
                 .HasForeignKey(u => u.UserId);
-
-            //builder.HasIndex(x => x.ExternalId)
-            //    .IsUnique();
         }
     }
 }

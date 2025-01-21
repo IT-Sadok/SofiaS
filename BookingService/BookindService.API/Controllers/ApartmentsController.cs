@@ -9,7 +9,7 @@ namespace BookingService.API.Controllers
 {
     [Route("api/apartments")]
     [ApiController]
-    public class ApartmentsController : ControllerBase
+    public class ApartmentsController : BaseController
     {
         private readonly IApartmentService _apartmentService;
 
@@ -33,6 +33,15 @@ namespace BookingService.API.Controllers
                 ApartmentId = result.Value, 
                 Message = "Apartment is successfully created." }
             );
+        }
+
+        [HttpPost("{apartmentId}")]
+        [Authorize(Roles = Roles.Host)]
+        public async Task<IActionResult> UpsertCustomData(int apartmentId, [FromBody] object customData)
+        {
+            var hostId = GetUserIdFromToken();
+            var result = await _apartmentService.UpsertCustomDataAsync(apartmentId, hostId, customData);
+            return Ok(result.IsSuccess);
         }
     }
 }

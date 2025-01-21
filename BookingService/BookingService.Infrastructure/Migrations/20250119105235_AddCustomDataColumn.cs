@@ -7,7 +7,7 @@
 namespace BookingService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddColumns : Migration
+    public partial class AddCustomDataColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,40 +15,32 @@ namespace BookingService.Infrastructure.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "3ac52668-7612-4dab-8903-1a863ca1c2d2");
+                keyValue: "2418ca95-a923-4e9e-970a-984a04dd9ac2");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "3d88752b-0276-4c1c-89aa-428af122fb4f");
+                keyValue: "3f5af12b-f962-447a-b60a-d31fc90c8525");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "6f4da681-bcd5-47e5-9abf-125351ea0cd2");
+                keyValue: "4b3d8121-8760-4e7a-a201-f0684ee56bb1");
 
             migrationBuilder.AddColumn<string>(
-                name: "ExternalId",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "ExternalId",
+                name: "CustomData",
                 table: "Apartments",
                 type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+                nullable: true);
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "309857a9-581c-4858-bc14-b55a9d169e28", null, "Admin", "ADMIN" },
-                    { "53cfe11d-8c15-41fb-94cb-db61a82bf45c", null, "User", "USER" },
-                    { "e5554ba3-b449-492b-8245-8d8cce20eded", null, "Host", "HOST" }
+                    { "18717da5-cf36-45a0-a578-4d108aa55737", null, "Admin", "ADMIN" },
+                    { "44d622ea-36d3-4896-ab37-8a2c68bb71e5", null, "User", "USER" },
+                    { "ce814dad-bde0-42fb-b6a4-ecfb572d8497", null, "Host", "HOST" }
                 });
         }
 
@@ -58,24 +50,20 @@ namespace BookingService.Infrastructure.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "309857a9-581c-4858-bc14-b55a9d169e28");
+                keyValue: "18717da5-cf36-45a0-a578-4d108aa55737");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "53cfe11d-8c15-41fb-94cb-db61a82bf45c");
+                keyValue: "44d622ea-36d3-4896-ab37-8a2c68bb71e5");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "e5554ba3-b449-492b-8245-8d8cce20eded");
+                keyValue: "ce814dad-bde0-42fb-b6a4-ecfb572d8497");
 
             migrationBuilder.DropColumn(
-                name: "ExternalId",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "ExternalId",
+                name: "CustomData",
                 table: "Apartments");
 
             migrationBuilder.InsertData(
@@ -83,9 +71,9 @@ namespace BookingService.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "3ac52668-7612-4dab-8903-1a863ca1c2d2", null, "User", "USER" },
-                    { "3d88752b-0276-4c1c-89aa-428af122fb4f", null, "Host", "HOST" },
-                    { "6f4da681-bcd5-47e5-9abf-125351ea0cd2", null, "Admin", "ADMIN" }
+                    { "2418ca95-a923-4e9e-970a-984a04dd9ac2", null, "Host", "HOST" },
+                    { "3f5af12b-f962-447a-b60a-d31fc90c8525", null, "User", "USER" },
+                    { "4b3d8121-8760-4e7a-a201-f0684ee56bb1", null, "Admin", "ADMIN" }
                 });
         }
     }

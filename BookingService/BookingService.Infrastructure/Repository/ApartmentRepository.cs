@@ -1,6 +1,10 @@
-﻿using BookingService.Domain.Interfaces;
+﻿using BookingService.Domain.DTOs;
 using BookingService.Domain.Entities;
+using BookingService.Domain.Interfaces;
 using BookingService.Infrastructure.Database;
+using BookingService.Infrastructure.Resources;
+using Dapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookingService.Infrastructure.Repository
 {
@@ -18,6 +22,14 @@ namespace BookingService.Infrastructure.Repository
             await _context.Apartments.AddAsync(apartment);
             await _context.SaveChangesAsync();
             return apartment.Id;
+        }
+
+        public async Task UpsertCustomData(int apartmentId, string hostId, string customData)
+        {
+            var sql = SqlScripts.UpsertApartmentCustomData;
+
+            await using var connection = _context.Database.GetDbConnection();
+            await connection.ExecuteAsync(sql, new { Id = apartmentId, HostId = hostId, CustomData = customData });
         }
 
         public async Task<Apartment?> FindByIdAsync(int apartmentId)
@@ -43,6 +55,15 @@ namespace BookingService.Infrastructure.Repository
                                     && a.StartDate < endDate)
                                 .ToList(); 
             return !bookings.Any();
+        }
+
+        public async Task<IEnumerable<ApartmentPriceQuantilesQueryResult>> GetPriceQuantiles()
+        {
+            var sql = SqlScripts.GetPriceQuantiles;
+
+            await using var connection = _context.Database.GetDbConnection();
+
+            return await connection.QueryAsync<ApartmentPriceQuantilesQueryResult>(sql);
         }
     }
 }
