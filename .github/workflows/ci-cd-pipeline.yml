@@ -32,7 +32,7 @@ jobs:
           dotnet test BookingService/ \
           --no-build \
           --configuration Release \
-          --logger ./TestResults/test-results.trx" \
+          --logger "trx;LogFileName=./TestResults/test-results.trx" \
           --results-directory BookingService/BookingService.Testing/TestResults
 
       - name: Upload test results
