@@ -29,10 +29,10 @@ jobs:
 
       - name: Run Tests
         run: |
-          dotnet test BookingService/BookingService.sln \
+          dotnet test BookingService/ \
           --no-build \
           --configuration Release \
-          --logger "xunit;LogFilePath=BookingService.Testing/TestResults/test-results.xml"
+          --logger ./TestResults/test-results.trx" \
           --results-directory BookingService/BookingService.Testing/TestResults
 
       - name: Upload test results
