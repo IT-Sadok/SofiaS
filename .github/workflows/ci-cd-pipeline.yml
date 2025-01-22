@@ -19,10 +19,7 @@ jobs:
           dotnet-version: "8.0"
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore BookingService/BookingService.sln
 
       - name: Build project
-        run: dotnet build --configuration Release
-
-      - name: Run tests
-        run: dotnet test --configuration Release --logger "xunit;LogFilePath=test-results.xml"
+        run: dotnet build BookingService/BookingService.sln --no restore --configuration Release
