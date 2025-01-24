@@ -24,19 +24,15 @@ jobs:
       - name: Build project
         run: dotnet build BookingService/BookingService.sln --no-restore --configuration Release
 
-      - name: Create TestResults Directory
-        run: mkdir -p BookingService.Testing/TestResults
-
       - name: Run Tests
         run: |
           dotnet test BookingService/ \
           --no-build \
           --configuration Release \
-          --logger "trx;LogFileName=test-results.trx" \
-          --results-directory BookingService/BookingService.Testing/TestResults
+          --logger "trx;LogFileName=results.trx"
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: /home/runner/work/SofiaS/SofiaS/BookingService/BookingService.Testing/TestResults/test-results.trx
+          path: results.trx
