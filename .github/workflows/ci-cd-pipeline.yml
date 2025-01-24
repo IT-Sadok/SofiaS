@@ -18,6 +18,9 @@ jobs:
         with:
           dotnet-version: "8.0"
 
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
       - name: Restore dependencies
         run: dotnet restore BookingService/BookingService.sln
 
@@ -29,10 +32,24 @@ jobs:
           dotnet test BookingService/ \
           --no-build \
           --configuration Release \
-          --logger "trx;LogFileName=results.trx"
+          --logger "trx;LogFileName=results.trx" \
+          --collect "Code Coverage"
+
+      - name: Generate Code Coverage Report
+        run: |
+          reportgenerator \
+          "-reports:TestResults/**/coverage.cobertura.xml" \
+          "-targetdir:TestResults/CoverageReport" \
+          "-reporttypes:Html"
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: BookingService/BookingService.Testing/TestResults/results.trx
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: TestResults/CoverageReport/
