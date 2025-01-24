@@ -62,4 +62,6 @@ jobs:
                        -f BookingService/BookindService.API/Dockerfile BookingService/
 
       - name: Push Docker image to DockerHub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:latest
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:$(git rev-parse --short HEAD) \
+          docker push ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:latest
