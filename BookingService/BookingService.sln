@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.API", "BookindService.API\BookingService.API.csproj", "{6EC62DCB-F398-4D43-B325-B51A7EB4BC74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookindService.API", "BookindService.API\BookindService.API.csproj", "{6EC62DCB-F398-4D43-B325-B51A7EB4BC74}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.Domain", "BookingService.Domain\BookingService.Domain.csproj", "{AE7B9AA5-5A91-4E8F-91E3-C2AFF910956E}"
 EndProject
@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.Infrastructu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService.Testing", "BookingService.Testing\BookingService.Testing.csproj", "{86502608-81F3-4588-B45D-B477CB6AA752}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migration", "Migration\Migration.csproj", "{68DBD49A-C69A-475E-9EC2-FDC38DDF3967}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migration", "Migration\Migration.csproj", "{68DBD49A-C69A-475E-9EC2-FDC38DDF3967}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
