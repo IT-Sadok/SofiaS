@@ -30,7 +30,7 @@ jobs:
           --no-build \
           --configuration Release \
           --logger "trx;LogFileName=results.trx" \
-          --working-directory TestResults
+          --results-directory TestResults
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
