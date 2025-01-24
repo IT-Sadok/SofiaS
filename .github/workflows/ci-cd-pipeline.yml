@@ -34,6 +34,15 @@ jobs:
           --configuration Release \
           --logger "trx;LogFileName=results.trx"
 
+      - name: Generate test report
+        run: reportgenerator "-reports:**/TestResults/*" "-targetdir:./TestReports" -reporttypes:Html
+
+      - name: Upload test report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: ./TestReports
+
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
