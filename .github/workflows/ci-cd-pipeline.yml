@@ -61,11 +61,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t IMAGE_NAME:COMMIT_HASH \
-                       -t IMAGE_NAME:latest \
-                       -f BookingService/BookindService.API/Dockerfile BookingService/
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:${{ env.COMMIT_HASH }} \
+                       -t ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:latest \
 
       - name: Push Docker image to DockerHub
         run: |
-          docker push IMAGE_NAME:COMMIT_HASH \
-          docker push IMAGE_NAME:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:${{ env.COMMIT_HASH }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:latest
