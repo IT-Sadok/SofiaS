@@ -32,10 +32,10 @@ jobs:
           dotnet test BookingService/ \
           --no-build \
           --configuration Release \
-          --logger "trx;LogFileName=TestResults/results.trx"
+          --logger "trx;LogFileName=results.trx"
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: TestResults/results.trx
+          path: "**/TestResults/*"
