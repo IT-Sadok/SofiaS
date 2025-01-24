@@ -29,7 +29,8 @@ jobs:
           dotnet test BookingService/ \
           --no-build \
           --configuration Release \
-          --logger "trx;LogFilePath=TestResults/results.trx"
+          --logger "trx;LogFileName=results.trx" \
+          --working-directory TestResults
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
