@@ -29,13 +29,14 @@ jobs:
           dotnet test BookingService/ \
           --no-build \
           --configuration Release \
-          --logger "trx;LogFileName=results.trx"
+          --logger "trx;LogFileName=results.trx" \
+          --results-directory TestResults
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: "**/TestResults/*"
+          path: TestResults/*
 
   docker:
     needs: build-and-test
