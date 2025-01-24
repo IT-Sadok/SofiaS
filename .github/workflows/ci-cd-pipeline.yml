@@ -56,8 +56,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:latest \
-                       -f BookingService/BookingService.API/Dockerfile BookingService/
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/bookingwebapi:latest \
+                       -f BookingService/BookindService.API/Dockerfile BookingService/BookindService.API/
 
       - name: Push Docker image to DockerHub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/bookingserviceapi:latest
